@@ -3,6 +3,7 @@ defmodule ExMangaDownloadr.Workflow do
   alias ExMangaDownloadr.ChapterPage
   alias ExMangaDownloadr.Page
   alias Porcelain.Result
+  require Logger
 
   @image_dimensions "600x800"
   @pages_per_volume 250
@@ -16,7 +17,7 @@ defmodule ExMangaDownloadr.Workflow do
     chapter_list
       |> Enum.map(fn chapter_page ->
         Task.async(fn ->
-          IO.puts("Fetching pages from chapter #{chapter_page}")
+          Logger.debug("Fetching pages from chapter #{chapter_page}")
           ChapterPage.pages(chapter_page)
         end)
       end)
@@ -29,7 +30,7 @@ defmodule ExMangaDownloadr.Workflow do
         pages_list
         |> Enum.map(fn page ->
           Task.async(fn ->
-            IO.puts("Fetching image source from page #{page}")
+            Logger.debug("Fetching image source from page #{page}")
             Page.image(page)
           end)
         end)
@@ -43,7 +44,7 @@ defmodule ExMangaDownloadr.Workflow do
         images_list
         |> Enum.map(fn {:ok, {image_src, image_filename}} ->
           Task.async(fn ->
-            IO.puts "Downloading image #{image_src} to #{image_filename}"
+            Logger.debug("Downloading image #{image_src} to #{image_filename}")
             download_image(image_src, image_filename, directory)
           end)
         end)
@@ -52,7 +53,7 @@ defmodule ExMangaDownloadr.Workflow do
   end
 
   def optimize_images(directory) do
-    IO.puts "Running mogrify to convert all images down to Kindle supported size (600x800)"
+    Logger.debug("Running mogrify to convert all images down to Kindle supported size (600x800)")
     Porcelain.shell("mogrify -resize #{@image_dimensions} #{directory}/*.jpg")
     directory
   end
@@ -96,7 +97,7 @@ defmodule ExMangaDownloadr.Workflow do
         [destination_file|_rest] = String.split(file, "/") |> Enum.reverse
         File.rename(file, "#{volume_directory}/#{destination_file}")
       end)
-    IO.puts "Compiling #{volume_file}."
+    Logger.debug("Compiling #{volume_file}.")
     Task.async(fn ->
       Porcelain.shell("convert #{volume_directory}/*.jpg #{volume_file}")
     end)

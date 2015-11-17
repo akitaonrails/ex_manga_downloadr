@@ -40,6 +40,7 @@ defmodule ExMangaDownloadr.CLI do
       |> Workflow.optimize_images()
       |> Workflow.compile_pdfs(manga_name)
 
+    IO.puts "Finished, please check your PDF files at #{directory}."
     System.halt(0)
   end
 end
