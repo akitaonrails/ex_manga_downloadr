@@ -1,6 +1,6 @@
 defmodule ExMangaDownloadr.IndexPage do
-  def chapters(manga_name) do
-    case HTTPotion.get("http://www.mangareader.net/#{manga_name}") do
+  def chapters(manga_root_url) do
+    case HTTPotion.get(manga_root_url, [timeout: 30_000]) do
       %HTTPotion.Response{ body: body, headers: _headers, status_code: 200 } ->
         {:ok, fetch_manga_title(body), fetch_chapters(body) }
       _ ->

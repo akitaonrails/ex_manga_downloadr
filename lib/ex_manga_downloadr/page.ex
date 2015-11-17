@@ -1,6 +1,6 @@
 defmodule ExMangaDownloadr.Page do
   def image(page_link) do
-    case HTTPotion.get("http://www.mangareader.net#{page_link}") do
+    case HTTPotion.get("http://www.mangareader.net#{page_link}", [timeout: 30_000]) do
       %HTTPotion.Response{ body: body, headers: _headers, status_code: 200 } ->
         { :ok, fetch_image(body) }
       _ ->

@@ -5,7 +5,7 @@ defmodule ExMangaDownloadrTest do
   alias ExMangaDownloadr.Page
   doctest ExMangaDownloadr
 
-  @test_manga "onepunch-man"
+  @test_manga_url "http://www.mangareader.net/onepunch-man"
   @manga_title "Onepunch-Man Manga"
   @expected_chapters ["/onepunch-man/1", "/onepunch-man/2", "/onepunch-man/3", "/onepunch-man/4",
     "/onepunch-man/5", "/onepunch-man/6", "/onepunch-man/7", "/onepunch-man/8", "/onepunch-man/9",
@@ -37,7 +37,7 @@ defmodule ExMangaDownloadrTest do
   @expected_image_alt "Onepunch-Man 00001 - Page 00001.jpg"
 
   test "get all chapters available for the manga" do
-    {:ok, manga_title, chapter_list} = IndexPage.chapters(@test_manga)
+    {:ok, manga_title, chapter_list} = IndexPage.chapters(@test_manga_url)
     assert manga_title == @manga_title
     assert chapter_list == @expected_chapters
   end
