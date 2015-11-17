@@ -15,7 +15,7 @@ defmodule ExMangaDownloadr.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :httpotion]]
+    [applications: [:logger, :httpotion, :porcelain]]
   end
 
   # Dependencies can be Hex packages:
@@ -31,7 +31,8 @@ defmodule ExMangaDownloadr.Mixfile do
     [
       {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
       {:httpotion, "~> 2.1.0"},
-      {:floki, "~> 0.7"}
+      {:floki, "~> 0.7"},
+      {:porcelain, "~> 2.0"}
     ]
   end
 end

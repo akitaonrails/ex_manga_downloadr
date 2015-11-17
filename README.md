@@ -10,18 +10,22 @@ Not so sure if I need to use the HTTPotion Async support or create an Agent/GenS
 
 This can be compiled as a command line tool:
 
-  1. Fetch dependencies:
+  1. You will need to install ImageMagick in your system (to resize images to Kindle format and merge them into PDF volumes). Refer to your system's particular install. In Ubuntu, simply do:
+
+     sudo apt-get install imagemagick
+
+  2. Fetch Elixir dependencies:
 
         mix deps.get
 
-  2. Run tests if you want to contribute:
+  3. Run tests if you want to contribute:
 
         mix test
 
-  3. Build
+  4. Build
 
         mix escript.build 
 
-  4. Try to fetch a small manga to test it working:
+  5. Try to fetch a small manga to test it working:
 
-        ./ex_manga_downloadr -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami 
+        ./ex_manga_downloadr -name boku-wa-ookami -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami
