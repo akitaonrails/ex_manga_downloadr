@@ -1,8 +1,6 @@
 defmodule ExMangaDownloadr.CLI do
   alias ExMangaDownloadr.Workflow
 
-
-
   def main(args) do
     args
     |> parse_args
@@ -22,7 +20,7 @@ defmodule ExMangaDownloadr.CLI do
 
   defp process(:help) do
     IO.puts """
-      usage: ./ex_manga_downloadr -name boku-wa-ookami -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami
+      usage: ./ex_manga_downloadr -n boku-wa-ookami -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami
     """
     System.halt(0)
   end
@@ -37,7 +35,7 @@ defmodule ExMangaDownloadr.CLI do
       |> Workflow.process_downloads(directory)
 
     directory
-      |> Workflow.optimize_images()
+      |> Workflow.optimize_images
       |> Workflow.compile_pdfs(manga_name)
 
     IO.puts "Finished, please check your PDF files at #{directory}."

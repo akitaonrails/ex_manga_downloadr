@@ -28,12 +28,12 @@ defmodule ExMangaDownloadr.Workflow do
     pages_group
       |> Enum.map(fn {:ok, pages_list} ->
         pages_list
-        |> Enum.map(fn page ->
-          Task.async(fn ->
-            Logger.debug("Fetching image source from page #{page}")
-            Page.image(page)
+          |> Enum.map(fn page ->
+            Task.async(fn ->
+              Logger.debug("Fetching image source from page #{page}")
+              Page.image(page)
+            end)
           end)
-        end)
         |> Enum.map(fn pid -> Task.await(pid, 30_000) end)
       end)
   end
@@ -42,12 +42,12 @@ defmodule ExMangaDownloadr.Workflow do
     images_group
       |> Enum.map(fn images_list ->
         images_list
-        |> Enum.map(fn {:ok, {image_src, image_filename}} ->
-          Task.async(fn ->
-            Logger.debug("Downloading image #{image_src} to #{image_filename}")
-            download_image(image_src, image_filename, directory)
+          |> Enum.map(fn {:ok, {image_src, image_filename}} ->
+            Task.async(fn ->
+              Logger.debug("Downloading image #{image_src} to #{image_filename}")
+              download_image(image_src, image_filename, directory)
+            end)
           end)
-        end)
         |> Enum.map(fn pid -> Task.await(pid, 30_000) end)
       end)
   end
