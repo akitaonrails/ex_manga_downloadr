@@ -71,7 +71,7 @@ defmodule ExMangaDownloadr.CLI do
         |> Enum.map(fn pid -> Task.await(pid, 30_000) end)
       end)
 
-    image_files_list = download_results
+    download_results
       |> Enum.reduce(fn list, acc -> list ++ acc end)
       |> Enum.map(fn result -> 
         case result do
@@ -86,12 +86,16 @@ defmodule ExMangaDownloadr.CLI do
     IO.puts "Running mogrify to convert all images down to Kindle supported size (600x800)"
     %Result{out: _output, status: _status} = Porcelain.shell("mogrify -resize 600x800 #{directory}/*.jpg")
 
-    chunk_size = length(image_files_list)
+    {:ok, final_files_list} = File.ls(directory)
+
+    chunk_size = length(final_files_list)
     if chunk_size > @pages_per_volume do
       chunk_size = @pages_per_volume 
     end
 
-    image_files_list
+    final_files_list
+    |> Enum.sort
+    |> Enum.map(fn filename -> "#{directory}/#{filename}" end)
     |> Enum.chunk(chunk_size)
     |> Enum.with_index
     |> Enum.map(fn {chunk, index} -> creating_volume(manga_name, directory, chunk, index) end)
