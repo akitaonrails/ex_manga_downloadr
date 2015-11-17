@@ -62,8 +62,7 @@ defmodule ExMangaDownloadr.CLI do
         |> Enum.map(fn {:ok, {image_src, image_filename}} ->
           Task.async(fn -> 
             IO.puts "Downloading image #{image_src} to #{image_filename}"
-            # download_image(image_src, image_filename, directory)
-
+            download_image(image_src, image_filename, directory)
           end)
         end)
         |> Enum.map(fn pid -> Task.await(pid, 30_000) end)
@@ -74,7 +73,7 @@ defmodule ExMangaDownloadr.CLI do
     |> Enum.each(fn result -> 
       case result do
         {:err, image_src} -> IO.puts("Error downloading #{image_src}")
-        :ok -> result
+        {:ok, image_src} -> image_src
       end
     end)
 
@@ -83,10 +82,10 @@ defmodule ExMangaDownloadr.CLI do
   end
 
   defp download_image(image_src, image_filename, directory) do
-    case HTTPoison.get(image_src, [timeout: 30_000]) do
+    case HTTPotion.get(image_src, [timeout: 30_000]) do
       %HTTPotion.Response{ body: body, headers: _headers, status_code: 200 } ->
         File.write!("#{directory}/#{image_filename}", body)
-        :ok
+        {:ok, image_src}
       _ ->
         {:err, image_src}
     end
