@@ -28,8 +28,8 @@ This can be compiled as a command line tool:
 
   4. Build
 
-        mix escript.build 
+        mix escript.build
 
   5. Try to fetch a small manga to test it working:
 
-        ./ex_manga_downloadr -name boku-wa-ookami -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami
+        ./ex_manga_downloadr -n boku-wa-ookami -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami
