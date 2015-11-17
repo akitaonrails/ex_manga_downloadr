@@ -2,6 +2,7 @@ defmodule ExMangaDownloadrTest do
   use ExUnit.Case
   alias ExMangaDownloadr.IndexPage
   alias ExMangaDownloadr.ChapterPage
+  alias ExMangaDownloadr.Page
   doctest ExMangaDownloadr
 
   @test_manga "onepunch-man"
@@ -32,6 +33,9 @@ defmodule ExMangaDownloadrTest do
     "/onepunch-man/1/16", "/onepunch-man/1/17", "/onepunch-man/1/18",
     "/onepunch-man/1/19"]
 
+  @expected_image_src "http://i3.mangareader.net/onepunch-man/1/onepunch-man-3798615.jpg"
+  @expected_image_alt "Onepunch-Man 00001 - Page 00001.jpg"
+
   test "get all chapters available for the manga" do
     {:ok, manga_title, chapter_list} = IndexPage.chapters(@test_manga)
     assert manga_title == @manga_title
@@ -41,5 +45,11 @@ defmodule ExMangaDownloadrTest do
   test "get all the pages of a given chapter" do
     {:ok, pages_list} = ChapterPage.pages(@expected_chapters |> Enum.at(0))
     assert pages_list == @expected_pages
+  end
+
+  test "get the main image of each page" do
+    {:ok, {image_src, image_alt}} = Page.image(@expected_pages |> Enum.at(0))
+    assert image_src == @expected_image_src
+    assert image_alt == @expected_image_alt    
   end
 end
