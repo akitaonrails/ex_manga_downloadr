@@ -3,6 +3,7 @@ defmodule ExMangaDownloadrTest do
   alias ExMangaDownloadr.IndexPage
   alias ExMangaDownloadr.ChapterPage
   alias ExMangaDownloadr.Page
+  alias ExMangaDownloadr.Workflow
   doctest ExMangaDownloadr
 
   @test_manga_url "http://www.mangareader.net/onepunch-man"
