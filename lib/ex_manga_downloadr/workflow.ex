@@ -38,10 +38,15 @@ defmodule ExMangaDownloadr.Workflow do
 
   def process_downloads(images_list, directory) do
     images_list
-      |> Enum.map(fn {:ok, {image_src, image_filename}} ->
-        Task.async(fn -> download_image(image_src, image_filename, directory) end)
+      |> chunk(@maximum_fetches)
+      |> Enum.reduce([], fn images_chunk, acc ->
+        result = images_chunk
+          |> Enum.map(fn {:ok, {image_src, image_filename}} ->
+            Task.async(fn -> download_image(image_src, image_filename, directory) end)
+          end)
+          |> Enum.map(fn pid -> Task.await(pid, 30_000) end)
+        acc ++ result
       end)
-      |> Enum.map(fn pid -> Task.await(pid, 30_000) end)
   end
 
   def optimize_images(directory) do
