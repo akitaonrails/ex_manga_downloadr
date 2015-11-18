@@ -102,15 +102,7 @@ defmodule ExMangaDownloadr.Workflow do
   end
 
   defp chunk(collection, default_size) do
-    size = chunk_size(collection, default_size)
+    size = [Enum.count(collection), default_size] |> Enum.min
     Enum.chunk(collection, size, size, [])
   end
-
-  defp chunk_size(collection, default_size) do
-    result = Enum.count(collection)
-    if result > default_size do
-      result = default_size
-    end
-    result
-  end  
 end
