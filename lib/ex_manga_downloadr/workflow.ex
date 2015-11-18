@@ -6,6 +6,7 @@ defmodule ExMangaDownloadr.Workflow do
   @pages_per_volume 250
   @maximum_fetches 80
   @maximum_pdf_generation 4
+  @http_timeout 30_000
 
   def chapters(url) do
     {:ok, _manga_title, chapter_list} = IndexPage.chapters(url)
@@ -15,7 +16,7 @@ defmodule ExMangaDownloadr.Workflow do
   def pages(chapter_list) do
     chapter_list
       |> Enum.map(&(Task.async(fn -> ChapterPage.pages(&1) end)))
-      |> Enum.map(&(Task.await(&1, 30_000)))
+      |> Enum.map(&(Task.await(&1, @http_timeout)))
       |> Enum.reduce([], fn {:ok, list}, acc -> acc ++ list end)
   end
 
@@ -25,7 +26,7 @@ defmodule ExMangaDownloadr.Workflow do
       |> Enum.reduce([], fn pages_chunk, acc ->
         result = pages_chunk
           |> Enum.map(&(Task.async(fn -> Page.image(&1) end)))
-          |> Enum.map(&(Task.await(&1, 30_000)))
+          |> Enum.map(&(Task.await(&1, @http_timeout)))
           |> Enum.map(fn {:ok, image} -> image end)
         acc ++ result
       end)
@@ -37,7 +38,7 @@ defmodule ExMangaDownloadr.Workflow do
       |> Enum.reduce([], fn images_chunk, acc ->
         result = images_chunk
           |> Enum.map(&(Task.async(fn -> download_image(&1, directory) end)))
-          |> Enum.map(&(Task.await(&1, 30_000)))
+          |> Enum.map(&(Task.await(&1, @http_timeout)))
         acc ++ result
       end)
   end
@@ -51,7 +52,7 @@ defmodule ExMangaDownloadr.Workflow do
   defp download_image({image_src, image_filename}, directory) do
     filename = "#{directory}/#{image_filename}"
     Logger.debug("Downloading image #{image_src} to #{filename}")
-    case HTTPotion.get(image_src, [timeout: 30_000]) do
+    case HTTPotion.get(image_src, [timeout: @http_timeout]) do
       %HTTPotion.Response{ body: body, headers: _headers, status_code: 200 } ->
         File.write!(filename, body)
         {:ok, image_src, filename}
@@ -72,7 +73,7 @@ defmodule ExMangaDownloadr.Workflow do
       |> Enum.map(fn batch -> 
         batch
           |> Enum.map(&(compile_volume(manga_name, directory, &1)))
-          |> Enum.map(&(Task.await(&1, 300_000)))
+          |> Enum.map(&(Task.await(&1, @http_timeout)))
       end)
       
     directory
