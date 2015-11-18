@@ -14,10 +14,8 @@ defmodule ExMangaDownloadr.Workflow do
 
   def pages(chapter_list) do
     chapter_list
-      |> Enum.map(fn chapter_page ->
-        Task.async(fn -> ChapterPage.pages(chapter_page) end)
-      end)
-      |> Enum.map(fn pid -> Task.await(pid, 30_000) end)
+      |> Enum.map(&(Task.async(fn -> ChapterPage.pages(&1) end)))
+      |> Enum.map(&(Task.await(&1, 30_000)))
       |> Enum.reduce([], fn {:ok, list}, acc -> acc ++ list end)
   end
 
@@ -26,10 +24,8 @@ defmodule ExMangaDownloadr.Workflow do
       |> chunk(@maximum_fetches)
       |> Enum.reduce([], fn pages_chunk, acc ->
         result = pages_chunk
-          |> Enum.map(fn page ->
-            Task.async(fn -> Page.image(page) end)
-          end)
-          |> Enum.map(fn pid -> Task.await(pid, 30_000) end)
+          |> Enum.map(&(Task.async(fn -> Page.image(&1) end)))
+          |> Enum.map(&(Task.await(&1, 30_000)))
           |> Enum.map(fn {:ok, image} -> image end)
         acc ++ result
       end)
@@ -43,7 +39,7 @@ defmodule ExMangaDownloadr.Workflow do
           |> Enum.map(fn {image_src, image_filename} ->
             Task.async(fn -> download_image(image_src, image_filename, directory) end)
           end)
-          |> Enum.map(fn pid -> Task.await(pid, 30_000) end)
+          |> Enum.map(&(Task.await(&1, 30_000)))
         acc ++ result
       end)
   end
@@ -71,26 +67,28 @@ defmodule ExMangaDownloadr.Workflow do
 
     final_files_list
       |> Enum.sort
-      |> Enum.map(fn filename -> "#{directory}/#{filename}" end)
+      |> Enum.map(&("#{directory}/#{&1}"))
       |> chunk(@pages_per_volume)
       |> Enum.with_index
       |> chunk(@maximum_pdf_generation)
       |> Enum.map(fn batch -> 
         batch
           |> Enum.map(fn {chunk, index} ->
-            cmd = creating_volume(manga_name, directory, chunk, index)
-            Task.async(fn ->
-              Logger.debug("Compiling Volume #{index + 1}.")
-              Porcelain.shell(cmd)
-            end)
+            compile_volume(manga_name, directory, chunk, index)
           end)
-          |> Enum.map(fn pid -> Task.await(pid, 300_000) end)        
+          |> Enum.map(&(Task.await(&1, 300_000)))
       end)
       
     directory
   end
 
-  defp creating_volume(manga_name, directory, chunk, index) do
+  defp compile_volume(manga_name, directory, chunk, index) do
+    {:ok, convert_cmd} = prepare_volume(manga_name, directory, chunk, index)
+    Logger.debug "Compiling volume #{index + 1}."
+    Task.async(fn -> Porcelain.shell(convert_cmd) end)
+  end
+
+  defp prepare_volume(manga_name, directory, chunk, index) do
     volume_directory = "#{directory}/#{manga_name}_#{index + 1}"
     volume_file      = "#{volume_directory}.pdf"
     File.mkdir_p(volume_directory)
@@ -100,7 +98,7 @@ defmodule ExMangaDownloadr.Workflow do
       File.rename(file, "#{volume_directory}/#{destination_file}")
     end)
 
-    "convert #{volume_directory}/*.jpg #{volume_file}"
+    {:ok, "convert #{volume_directory}/*.jpg #{volume_file}"}
   end
 
   defp chunk(collection, default_size) do
