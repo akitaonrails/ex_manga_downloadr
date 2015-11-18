@@ -1,8 +1,8 @@
 defmodule ExMangaDownloadrTest do
   use ExUnit.Case
-  alias ExMangaDownloadr.IndexPage
-  alias ExMangaDownloadr.ChapterPage
-  alias ExMangaDownloadr.Page
+  alias ExMangaDownloadr.MangaReader.IndexPage
+  alias ExMangaDownloadr.MangaReader.ChapterPage
+  alias ExMangaDownloadr.MangaReader.Page
   alias ExMangaDownloadr.Workflow
   doctest ExMangaDownloadr
 

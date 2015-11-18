@@ -1,7 +1,7 @@
 defmodule ExMangaDownloadr.Workflow do
-  alias ExMangaDownloadr.IndexPage
-  alias ExMangaDownloadr.ChapterPage
-  alias ExMangaDownloadr.Page
+  alias ExMangaDownloadr.MangaReader.IndexPage
+  alias ExMangaDownloadr.MangaReader.ChapterPage
+  alias ExMangaDownloadr.MangaReader.Page
   require Logger
 
   @image_dimensions "600x800"
@@ -50,6 +50,18 @@ defmodule ExMangaDownloadr.Workflow do
     directory
   end
 
+  defp download_image(image_src, image_filename, directory) do
+    filename = "#{directory}/#{image_filename}"
+    Logger.debug("Downloading image #{image_src} to #{filename}")
+    case HTTPotion.get(image_src, [timeout: 30_000]) do
+      %HTTPotion.Response{ body: body, headers: _headers, status_code: 200 } ->
+        File.write!(filename, body)
+        {:ok, image_src, filename}
+      _ ->
+        {:err, image_src}
+    end
+  end
+
   def compile_pdfs(directory, manga_name) do
     {:ok, final_files_list} = File.ls(directory)
 
@@ -74,32 +86,6 @@ defmodule ExMangaDownloadr.Workflow do
     directory
   end
 
-  defp download_image(image_src, image_filename, directory) do
-    filename = "#{directory}/#{image_filename}"
-    Logger.debug("Downloading image #{image_src} to #{filename}")
-    case HTTPotion.get(image_src, [timeout: 30_000]) do
-      %HTTPotion.Response{ body: body, headers: _headers, status_code: 200 } ->
-        File.write!(filename, body)
-        {:ok, image_src, filename}
-      _ ->
-        {:err, image_src}
-    end
-  end
-
-  defp chunk(collection, default_size) do
-    size = chunk_size(collection, default_size)
-    Enum.chunk(collection, size, size, [])
-  end
-
-  defp chunk_size(collection, default_size) do
-    collection |> Enum.each(fn elem -> IO.inspect elem end)
-    result = Enum.count(collection)
-    if result > default_size do
-      result = default_size
-    end
-    result
-  end
-
   defp creating_volume(manga_name, directory, chunk, index) do
     volume_directory = "#{directory}/#{manga_name}_#{index + 1}"
     volume_file      = "#{volume_directory}.pdf"
@@ -112,4 +98,17 @@ defmodule ExMangaDownloadr.Workflow do
 
     "convert #{volume_directory}/*.jpg #{volume_file}"
   end
+
+  defp chunk(collection, default_size) do
+    size = chunk_size(collection, default_size)
+    Enum.chunk(collection, size, size, [])
+  end
+
+  defp chunk_size(collection, default_size) do
+    result = Enum.count(collection)
+    if result > default_size do
+      result = default_size
+    end
+    result
+  end  
 end

@@ -1,4 +1,4 @@
-defmodule ExMangaDownloadr.Page do
+defmodule ExMangaDownloadr.MangaReader.Page do
   require Logger
 
   def image(page_link) do

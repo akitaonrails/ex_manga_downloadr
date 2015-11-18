@@ -1,6 +1,6 @@
-defmodule ExMangaDownloadr.ChapterPage do
+defmodule ExMangaDownloadr.MangaReader.ChapterPage do
   require Logger
-  
+
   def pages(chapter_link) do
     Logger.debug("Fetching pages from chapter #{chapter_link}")
     case HTTPotion.get("http://www.mangareader.net#{chapter_link}", [timeout: 30_000]) do
