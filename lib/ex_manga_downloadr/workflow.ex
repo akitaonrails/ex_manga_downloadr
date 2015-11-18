@@ -61,12 +61,13 @@ defmodule ExMangaDownloadr.Workflow do
   def compile_pdfs(directory, manga_name) do
     {:ok, final_files_list} = File.ls(directory)
     final_files_list
-    |> Enum.sort
-    |> Enum.map(fn filename -> "#{directory}/#{filename}" end)
-    |> Enum.chunk(chunk_size(final_files_list))
-    |> Enum.with_index
-    |> Enum.map(fn {chunk, index} -> creating_volume(manga_name, directory, chunk, index) end)
-    |> Enum.map(fn pid -> Task.await(pid, 300_000) end)
+      |> Enum.sort
+      |> Enum.map(fn filename -> "#{directory}/#{filename}" end)
+      |> Enum.chunk(chunk_size(final_files_list))
+      |> Enum.with_index
+      |> Enum.map(fn {chunk, index} -> creating_volume(manga_name, directory, chunk, index) end)
+      |> Enum.map(fn pid -> Task.await(pid, 300_000) end)
+    directory
   end
 
   defp download_image(image_src, image_filename, directory) do
@@ -98,8 +99,8 @@ defmodule ExMangaDownloadr.Workflow do
         File.rename(file, "#{volume_directory}/#{destination_file}")
       end)
     Logger.debug("Compiling #{volume_file}.")
-    Task.async(fn ->
+    # Task.async(fn ->
       Porcelain.shell("convert #{volume_directory}/*.jpg #{volume_file}")
-    end)
+    # end)
   end
 end

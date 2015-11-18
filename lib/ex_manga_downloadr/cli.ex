@@ -14,13 +14,17 @@ defmodule ExMangaDownloadr.CLI do
     )
     case parse do
       {[name: manga_name, url: url, directory: directory], _, _} -> process(manga_name, url, directory)
+      {[name: manga_name, directory: directory], _, _} -> process(manga_name, directory)
       {_, _, _ } -> process(:help)
     end
   end
 
   defp process(:help) do
     IO.puts """
-      usage: ./ex_manga_downloadr -n boku-wa-ookami -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami
+      usage:
+        ./ex_manga_downloadr -n boku-wa-ookami -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami
+      or just to compile the PDFs (if already finished downloading)
+        ./ex_manga_downloadr -n boku-wa-ookami -d /tmp/boku-wa-ookami
     """
     System.halt(0)
   end
@@ -37,7 +41,18 @@ defmodule ExMangaDownloadr.CLI do
     directory
       |> Workflow.optimize_images
       |> Workflow.compile_pdfs(manga_name)
+      |> finish_process
+  end
 
+  defp process(manga_name, directory) do
+    IO.puts "Just going to compile PDFs at #{directory}"
+
+    directory
+      |> Workflow.compile_pdfs(manga_name)
+      |> finish_process
+  end
+
+  defp finish_process(directory) do
     IO.puts "Finished, please check your PDF files at #{directory}."
     System.halt(0)
   end
