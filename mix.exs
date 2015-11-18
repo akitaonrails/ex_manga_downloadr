@@ -32,7 +32,8 @@ defmodule ExMangaDownloadr.Mixfile do
       {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
       {:httpotion, "~> 2.1.0"},
       {:floki, "~> 0.7"},
-      {:porcelain, "~> 2.0"}
+      {:porcelain, "~> 2.0"},
+      {:mock, "~> 0.1.1", only: :test}
     ]
   end
 end

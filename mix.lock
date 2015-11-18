@@ -1,5 +1,7 @@
 %{"floki": {:hex, :floki, "0.7.1"},
   "httpotion": {:hex, :httpotion, "2.1.0"},
   "ibrowse": {:git, "https://github.com/cmullaparthi/ibrowse.git", "ea3305d21f37eced4fac290f64b068e56df7de80", [tag: "v4.1.2"]},
+  "meck": {:hex, :meck, "0.8.3"},
   "mochiweb": {:hex, :mochiweb, "2.12.2"},
+  "mock": {:hex, :mock, "0.1.1"},
   "porcelain": {:hex, :porcelain, "2.0.0"}}

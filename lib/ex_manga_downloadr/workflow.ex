@@ -32,6 +32,7 @@ defmodule ExMangaDownloadr.Workflow do
             Task.async(fn -> Page.image(page) end)
           end)
           |> Enum.map(fn pid -> Task.await(pid, 30_000) end)
+          |> Enum.map(fn {:ok, image} -> image end)
         acc ++ result
       end)
   end
@@ -41,7 +42,7 @@ defmodule ExMangaDownloadr.Workflow do
       |> chunk(@maximum_fetches)
       |> Enum.reduce([], fn images_chunk, acc ->
         result = images_chunk
-          |> Enum.map(fn {:ok, {image_src, image_filename}} ->
+          |> Enum.map(fn {image_src, image_filename} ->
             Task.async(fn -> download_image(image_src, image_filename, directory) end)
           end)
           |> Enum.map(fn pid -> Task.await(pid, 30_000) end)

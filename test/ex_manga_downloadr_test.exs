@@ -1,56 +1,63 @@
 defmodule ExMangaDownloadrTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: false
+  alias ExMangaDownloadr.Workflow
   alias ExMangaDownloadr.MangaReader.IndexPage
   alias ExMangaDownloadr.MangaReader.ChapterPage
   alias ExMangaDownloadr.MangaReader.Page
-  alias ExMangaDownloadr.Workflow
   doctest ExMangaDownloadr
 
-  @test_manga_url "http://www.mangareader.net/onepunch-man"
-  @manga_title "Onepunch-Man Manga"
-  @expected_chapters ["/onepunch-man/1", "/onepunch-man/2", "/onepunch-man/3", "/onepunch-man/4",
-    "/onepunch-man/5", "/onepunch-man/6", "/onepunch-man/7", "/onepunch-man/8", "/onepunch-man/9",
-    "/onepunch-man/10", "/onepunch-man/11", "/onepunch-man/12", "/onepunch-man/13", "/onepunch-man/14",
-    "/onepunch-man/15", "/onepunch-man/16", "/onepunch-man/17", "/onepunch-man/18", "/onepunch-man/19",
-    "/onepunch-man/20", "/onepunch-man/21", "/onepunch-man/22", "/onepunch-man/23", "/onepunch-man/24",
-    "/onepunch-man/25", "/onepunch-man/26", "/onepunch-man/27", "/onepunch-man/28", "/onepunch-man/29",
-    "/onepunch-man/30", "/onepunch-man/31", "/onepunch-man/32", "/onepunch-man/33", "/onepunch-man/34",
-    "/onepunch-man/35", "/onepunch-man/36", "/onepunch-man/37", "/onepunch-man/38", "/onepunch-man/39",
-    "/onepunch-man/40", "/onepunch-man/41", "/onepunch-man/42", "/onepunch-man/43", "/onepunch-man/44",
-    "/onepunch-man/45", "/onepunch-man/46", "/onepunch-man/47", "/onepunch-man/48", "/onepunch-man/49",
-    "/onepunch-man/50", "/onepunch-man/51", "/onepunch-man/52", "/onepunch-man/53", "/onepunch-man/54",
-    "/onepunch-man/55", "/onepunch-man/56", "/onepunch-man/57", "/onepunch-man/58", "/onepunch-man/59",
-    "/onepunch-man/60", "/onepunch-man/61", "/onepunch-man/62", "/onepunch-man/63", "/onepunch-man/64",
-    "/onepunch-man/65", "/onepunch-man/66", "/onepunch-man/67", "/onepunch-man/68", "/onepunch-man/69",
-    "/onepunch-man/70", "/onepunch-man/71", "/onepunch-man/72", "/onepunch-man/73", "/onepunch-man/74",
-    "/onepunch-man/75", "/onepunch-man/76", "/onepunch-man/77", "/onepunch-man/78", "/onepunch-man/79",
-    "/onepunch-man/80", "/onepunch-man/81", "/onepunch-man/82", "/onepunch-man/83"]
+  import Mock
 
-  @expected_pages ["/onepunch-man/1", "/onepunch-man/1/2", "/onepunch-man/1/3",
-    "/onepunch-man/1/4", "/onepunch-man/1/5", "/onepunch-man/1/6",
-    "/onepunch-man/1/7", "/onepunch-man/1/8", "/onepunch-man/1/9",
-    "/onepunch-man/1/10", "/onepunch-man/1/11", "/onepunch-man/1/12",
-    "/onepunch-man/1/13", "/onepunch-man/1/14", "/onepunch-man/1/15",
-    "/onepunch-man/1/16", "/onepunch-man/1/17", "/onepunch-man/1/18",
-    "/onepunch-man/1/19"]
+  @expected_manga_title "Boku wa Ookami Manga"
+  @expected_chapters {:ok, @expected_manga_title,
+    ["/boku-wa-ookami/1", "/boku-wa-ookami/2", "/boku-wa-ookami/3"]}
+  @expected_pages {:ok,
+    ["/boku-wa-ookami/1", "/boku-wa-ookami/1/2", "/boku-wa-ookami/1/3"]}
+  @expected_image {:ok,
+    {"http://i3.mangareader.net/boku-wa-ookami/1/boku-wa-ookami-2523599.jpg",
+      "Ookami wa Boku 00001 - Page 00001.jpg"}}
 
-  @expected_image_src "http://i3.mangareader.net/onepunch-man/1/onepunch-man-3798615.jpg"
-  @expected_image_alt "Onepunch-Man 00001 - Page 00001.jpg"
-
-  test "get all chapters available for the manga" do
-    {:ok, manga_title, chapter_list} = IndexPage.chapters(@test_manga_url)
-    assert manga_title == @manga_title
-    assert chapter_list == @expected_chapters
+  test "workflow fetches chapters" do
+    with_mock IndexPage, [chapters: fn(_url) -> @expected_chapters end] do
+      assert {:ok, @expected_manga_title, Workflow.chapters("foo")} == @expected_chapters
+    end
   end
 
-  test "get all the pages of a given chapter" do
-    {:ok, pages_list} = ChapterPage.pages(@expected_chapters |> Enum.at(0))
-    assert pages_list == @expected_pages
+  test "workflow fetches pages from chapters" do
+    with_mock ChapterPage, [pages: fn(_chapter_link) -> @expected_pages end] do
+      assert {:ok, Workflow.pages(["foo"])} == @expected_pages
+    end
   end
 
-  test "get the main image of each page" do
-    {:ok, {image_src, image_alt}} = Page.image(@expected_pages |> Enum.at(0))
-    assert image_src == @expected_image_src
-    assert image_alt == @expected_image_alt    
+  test "workflow fetches image sources from pages" do
+    with_mock Page, [image: fn(_page_link) -> @expected_image end] do
+      {:ok, image} = @expected_image
+      assert Workflow.images_sources(["foo"]) == [image]
+    end
+  end
+
+  test "workflow tries to download the images" do
+    with_mock HTTPotion, [get: fn(_url, _options) -> %HTTPotion.Response{ body: nil, headers: nil, status_code: 200 } end] do
+      with_mock File, [write!: fn(_filename, _body) -> nil end] do
+        assert Workflow.process_downloads([{"http://src_foo", "filename_foo"}], "/tmp") == [{:ok, "http://src_foo", "/tmp/filename_foo"}]
+        
+        assert called HTTPotion.get("http://src_foo", [timeout: 30_000])
+        assert called File.write!("/tmp/filename_foo", nil)
+      end
+    end
+  end
+
+  test "workflow tries to generate the PDFs" do
+    with_mock File, [ls:      fn(_dir)       -> {:ok, ["1.jpg", "2.jpg"]} end,
+                     mkdir_p: fn(_dir)       -> nil end,
+                     rename:  fn(_from, _to) -> nil end] do
+      with_mock Porcelain, [shell: fn(_cmd) -> nil end] do
+        Workflow.compile_pdfs("/tmp/manga_foo", "manga_foo")
+
+        assert called File.rename("/tmp/manga_foo/1.jpg", "/tmp/manga_foo/manga_foo_1/1.jpg")
+        assert called File.rename("/tmp/manga_foo/2.jpg", "/tmp/manga_foo/manga_foo_1/2.jpg")
+        assert called Porcelain.shell("convert /tmp/manga_foo/manga_foo_1/*.jpg /tmp/manga_foo/manga_foo_1.pdf")
+      end
+    end
   end
 end
