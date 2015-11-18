@@ -1,9 +1,7 @@
 defmodule ExMangaDownloadrTest do
   use ExUnit.Case, async: false
+  use ExMangaDownloadr.MangaReader
   alias ExMangaDownloadr.Workflow
-  alias ExMangaDownloadr.MangaReader.IndexPage
-  alias ExMangaDownloadr.MangaReader.ChapterPage
-  alias ExMangaDownloadr.MangaReader.Page
   doctest ExMangaDownloadr
 
   import Mock
@@ -40,7 +38,7 @@ defmodule ExMangaDownloadrTest do
     with_mock HTTPotion, [get: fn(_url, _options) -> %HTTPotion.Response{ body: nil, headers: nil, status_code: 200 } end] do
       with_mock File, [write!: fn(_filename, _body) -> nil end] do
         assert Workflow.process_downloads([{"http://src_foo", "filename_foo"}], "/tmp") == [{:ok, "http://src_foo", "/tmp/filename_foo"}]
-        
+
         assert called HTTPotion.get("http://src_foo", [timeout: 30_000])
         assert called File.write!("/tmp/filename_foo", nil)
       end

@@ -1,9 +1,6 @@
 defmodule ExMangaDownloadr.MangaReaderTest do
   use ExUnit.Case
-  alias ExMangaDownloadr.MangaReader.IndexPage
-  alias ExMangaDownloadr.MangaReader.ChapterPage
-  alias ExMangaDownloadr.MangaReader.Page
-  alias ExMangaDownloadr.Workflow
+  use ExMangaDownloadr.MangaReader
 
   @test_manga_url "http://www.mangareader.net/onepunch-man"
   @manga_title "Onepunch-Man Manga"

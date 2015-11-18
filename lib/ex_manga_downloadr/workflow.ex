@@ -1,7 +1,5 @@
 defmodule ExMangaDownloadr.Workflow do
-  alias ExMangaDownloadr.MangaReader.IndexPage
-  alias ExMangaDownloadr.MangaReader.ChapterPage
-  alias ExMangaDownloadr.MangaReader.Page
+  use ExMangaDownloadr.MangaReader
   require Logger
 
   @image_dimensions "600x800"
