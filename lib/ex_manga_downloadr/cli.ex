@@ -30,7 +30,6 @@ defmodule ExMangaDownloadr.CLI do
   end
 
   defp process(manga_name, url, directory) do
-    IO.puts "Fetching from #{url} to #{directory}"
     File.mkdir_p!(directory)
 
     url
@@ -38,9 +37,6 @@ defmodule ExMangaDownloadr.CLI do
       |> Workflow.pages
       |> Workflow.images_sources
       |> Workflow.process_downloads(directory)
-
-    IO.puts "Optimizing and compiling PDFs."
-    directory
       |> Workflow.optimize_images
       |> Workflow.compile_pdfs(manga_name)
       |> finish_process

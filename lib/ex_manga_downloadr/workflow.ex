@@ -41,6 +41,7 @@ defmodule ExMangaDownloadr.Workflow do
           |> Enum.map(&(Task.await(&1, @http_timeout)))
         acc ++ result
       end)
+    directory
   end
 
   def optimize_images(directory) do
