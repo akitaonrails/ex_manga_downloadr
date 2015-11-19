@@ -6,7 +6,7 @@ defmodule ExMangaDownloadr.Workflow do
   @image_dimensions       "600x800" # Kindle maximum resolution
   @pages_per_volume       250       # comfortable PDF file number of pages
   @await_timeout_ms       1_000_000 # has to wait for huge number of async Tasks at once
-  @maximum_pdf_generation 4 # the best value is probably the total number of CPU cores
+  @maximum_pdf_generation 2 # the best value is probably the total number of CPU cores
 
   def chapters(url) do
     {:ok, _manga_title, chapter_list} = IndexPage.chapters(url)

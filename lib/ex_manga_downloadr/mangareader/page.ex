@@ -1,7 +1,7 @@
 defmodule ExMangaDownloadr.MangaReader.Page do
   require Logger
 
-  @http_timeout 30_000
+  @http_timeout 60_000
 
   def image(page_link) do
     Logger.debug("Fetching image source from page #{page_link}")

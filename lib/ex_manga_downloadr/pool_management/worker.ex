@@ -2,8 +2,8 @@ defmodule PoolManagement.Worker do
   use GenServer
   use ExMangaDownloadr.MangaReader
 
-  @timeout_ms 30_000
-  @transaction_timeout_ms 35_000 # larget just to be safe
+  @timeout_ms 1_000_000
+  @transaction_timeout_ms 1_000_000 # larget just to be safe
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, nil, [])
