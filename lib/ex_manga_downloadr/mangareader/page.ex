@@ -1,6 +1,8 @@
 defmodule ExMangaDownloadr.MangaReader.Page do
   require Logger
 
+  @http_timeout 30_000
+
   def image(page_link) do
     Logger.debug("Fetching image source from page #{page_link}")
     case HTTPotion.get("http://www.mangareader.net#{page_link}", [timeout: 30_000]) do
@@ -32,5 +34,17 @@ defmodule ExMangaDownloadr.MangaReader.Page do
     page_number    = Enum.at(list, 0) |> String.rjust(5, ?0)
 
     {image_src, "#{title_name} #{chapter_number} - Page #{page_number}.#{extension}"}
+  end
+
+  def download_image({image_src, image_filename}, directory) do
+    filename = "#{directory}/#{image_filename}"
+    Logger.debug("Downloading image #{image_src} to #{filename}")
+    case HTTPotion.get(image_src, [timeout: @http_timeout]) do
+      %HTTPotion.Response{ body: body, headers: _headers, status_code: 200 } ->
+        File.write!(filename, body)
+        {:ok, image_src, filename}
+      _ ->
+        {:err, image_src}
+    end
   end
 end

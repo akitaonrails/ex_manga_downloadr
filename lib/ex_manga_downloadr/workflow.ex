@@ -1,12 +1,12 @@
 defmodule ExMangaDownloadr.Workflow do
   use ExMangaDownloadr.MangaReader
+  alias PoolManagement.Worker
   require Logger
 
-  @image_dimensions "600x800"
-  @pages_per_volume 250
-  @maximum_fetches 80
-  @maximum_pdf_generation 4
-  @http_timeout 30_000
+  @image_dimensions       "600x800" # Kindle maximum resolution
+  @pages_per_volume       250       # comfortable PDF file number of pages
+  @await_timeout_ms       1_000_000 # has to wait for huge number of async Tasks at once
+  @maximum_pdf_generation 4 # the best value is probably the total number of CPU cores
 
   def chapters(url) do
     {:ok, _manga_title, chapter_list} = IndexPage.chapters(url)
@@ -16,31 +16,21 @@ defmodule ExMangaDownloadr.Workflow do
   def pages(chapter_list) do
     chapter_list
       |> Enum.map(&(Task.async(fn -> ChapterPage.pages(&1) end)))
-      |> Enum.map(&(Task.await(&1, @http_timeout)))
+      |> Enum.map(&(Task.await(&1, @await_timeout_ms)))
       |> Enum.reduce([], fn {:ok, list}, acc -> acc ++ list end)
   end
 
   def images_sources(pages_list) do
     pages_list
-      |> chunk(@maximum_fetches)
-      |> Enum.reduce([], fn pages_chunk, acc ->
-        result = pages_chunk
-          |> Enum.map(&(Task.async(fn -> Page.image(&1) end)))
-          |> Enum.map(&(Task.await(&1, @http_timeout)))
-          |> Enum.map(fn {:ok, image} -> image end)
-        acc ++ result
-      end)
+      |> Enum.map(&Worker.page_image/1)
+      |> Enum.map(&Task.await(&1, @await_timeout_ms))
+      |> Enum.map(fn {:ok, image} -> image end)
   end
 
   def process_downloads(images_list, directory) do
     images_list
-      |> chunk(@maximum_fetches)
-      |> Enum.reduce([], fn images_chunk, acc ->
-        result = images_chunk
-          |> Enum.map(&(Task.async(fn -> download_image(&1, directory) end)))
-          |> Enum.map(&(Task.await(&1, @http_timeout)))
-        acc ++ result
-      end)
+      |> Enum.map(&Worker.page_download_image(&1, directory))
+      |> Enum.map(&Task.await(&1, @await_timeout_ms))
     directory
   end
 
@@ -48,18 +38,6 @@ defmodule ExMangaDownloadr.Workflow do
     Logger.debug("Running mogrify to convert all images down to Kindle supported size (600x800)")
     Porcelain.shell("mogrify -resize #{@image_dimensions} #{directory}/*.jpg")
     directory
-  end
-
-  defp download_image({image_src, image_filename}, directory) do
-    filename = "#{directory}/#{image_filename}"
-    Logger.debug("Downloading image #{image_src} to #{filename}")
-    case HTTPotion.get(image_src, [timeout: @http_timeout]) do
-      %HTTPotion.Response{ body: body, headers: _headers, status_code: 200 } ->
-        File.write!(filename, body)
-        {:ok, image_src, filename}
-      _ ->
-        {:err, image_src}
-    end
   end
 
   def compile_pdfs(directory, manga_name) do
@@ -74,7 +52,7 @@ defmodule ExMangaDownloadr.Workflow do
       |> Enum.map(fn batch -> 
         batch
           |> Enum.map(&(compile_volume(manga_name, directory, &1)))
-          |> Enum.map(&(Task.await(&1, @http_timeout)))
+          |> Enum.map(&(Task.await(&1, @await_timeout_ms)))
       end)
       
     directory
