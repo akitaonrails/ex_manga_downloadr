@@ -38,13 +38,18 @@ defmodule ExMangaDownloadr.MangaReader.Page do
 
   def download_image({image_src, image_filename}, directory) do
     filename = "#{directory}/#{image_filename}"
-    Logger.debug("Downloading image #{image_src} to #{filename}")
-    case HTTPotion.get(image_src, [timeout: @http_timeout]) do
-      %HTTPotion.Response{ body: body, headers: _headers, status_code: 200 } ->
-        File.write!(filename, body)
-        {:ok, image_src, filename}
-      _ ->
-        {:err, image_src}
+    if File.exists?(filename) do
+      Logger.debug("Image #{filename} already downloaded, skipping.")
+      {:ok, image_src, filename}
+    else
+      Logger.debug("Downloading image #{image_src} to #{filename}")
+      case HTTPotion.get(image_src, [timeout: @http_timeout]) do
+        %HTTPotion.Response{ body: body, headers: _headers, status_code: 200 } ->
+          File.write!(filename, body)
+          {:ok, image_src, filename}
+        _ ->
+          {:err, image_src}
+      end
     end
   end
 end
