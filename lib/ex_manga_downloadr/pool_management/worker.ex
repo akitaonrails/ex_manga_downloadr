@@ -10,6 +10,13 @@ defmodule PoolManagement.Worker do
   end
 
   # Public APIs
+  def chapter_page(chapter_link) do
+    Task.async fn -> 
+      :poolboy.transaction :worker_pool, fn(server) ->
+        GenServer.call(server, {:chapter_page, chapter_link}, @timeout_ms)
+      end, @transaction_timeout_ms
+    end
+  end
 
   def page_image(page_link) do
     Task.async fn -> 
@@ -28,6 +35,10 @@ defmodule PoolManagement.Worker do
   end
 
   # internal GenServer implementation
+
+  def handle_call({:chapter_page, chapter_link}, _from, state) do
+    {:reply, ChapterPage.pages(chapter_link), state}
+  end
 
   def handle_call({:page_image, page_link}, _from, state) do
     {:reply, Page.image(page_link), state}

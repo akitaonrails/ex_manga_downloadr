@@ -15,7 +15,7 @@ defmodule ExMangaDownloadr.Workflow do
 
   def pages(chapter_list) do
     chapter_list
-      |> Enum.map(&(Task.async(fn -> ChapterPage.pages(&1) end)))
+      |> Enum.map(&Worker.chapter_page/1)
       |> Enum.map(&(Task.await(&1, @await_timeout_ms)))
       |> Enum.reduce([], fn {:ok, list}, acc -> acc ++ list end)
   end
