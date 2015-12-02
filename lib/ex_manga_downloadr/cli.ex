@@ -37,10 +37,19 @@ defmodule ExMangaDownloadr.CLI do
   defp process(manga_name, url, directory, source) do
     File.mkdir_p!(directory)
 
-    [url, source]
-      |> Workflow.chapters
-      |> Workflow.pages
-      |> Workflow.images_sources
+    dump_file = "#{directory}/images_list.dump"
+    images_list = if File.exists?(dump_file) do
+                    :erlang.binary_to_term(File.read!(dump_file))
+                  else
+                    list = [url, source]
+                      |> Workflow.chapters
+                      |> Workflow.pages
+                      |> Workflow.images_sources
+                    File.write(dump_file, :erlang.term_to_binary(list))
+                    list
+                  end
+
+    images_list
       |> Workflow.process_downloads(directory)
       |> Workflow.optimize_images
       |> Workflow.compile_pdfs(manga_name)
