@@ -1,5 +1,4 @@
 defmodule ExMangaDownloadr.Workflow do
-  use ExMangaDownloadr.MangaReader
   alias PoolManagement.Worker
   require Logger
 
@@ -8,21 +7,24 @@ defmodule ExMangaDownloadr.Workflow do
   @await_timeout_ms       1_000_000 # has to wait for huge number of async Tasks at once
   @maximum_pdf_generation 2 # the best value is probably the total number of CPU cores
 
-  def chapters(url) do
-    {:ok, _manga_title, chapter_list} = IndexPage.chapters(url)
-    chapter_list
+  def chapters([url, source]) do
+    {:ok, _manga_title, chapter_list} = source
+      |> Worker.manga_source("IndexPage")
+      |> apply(:chapters, [url])
+    [chapter_list, source]
   end
 
-  def pages(chapter_list) do
-    chapter_list
-      |> Enum.map(&Worker.chapter_page/1)
-      |> Enum.map(&(Task.await(&1, @await_timeout_ms)))
+  def pages([chapter_list, source]) do
+    pages_list = chapter_list
+      |> Enum.map(&Worker.chapter_page([&1, source]))
+      |> Enum.map(&Task.await(&1, @await_timeout_ms))
       |> Enum.reduce([], fn {:ok, list}, acc -> acc ++ list end)
+    [pages_list, source]
   end
 
-  def images_sources(pages_list) do
+  def images_sources([pages_list, source]) do
     pages_list
-      |> Enum.map(&Worker.page_image/1)
+      |> Enum.map(&Worker.page_image([&1, source]))
       |> Enum.map(&Task.await(&1, @await_timeout_ms))
       |> Enum.map(fn {:ok, image} -> image end)
   end

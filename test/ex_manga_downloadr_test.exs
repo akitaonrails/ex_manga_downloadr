@@ -1,45 +1,46 @@
 defmodule ExMangaDownloadrTest do
   use ExUnit.Case, async: false
-  use ExMangaDownloadr.MangaReader
   alias ExMangaDownloadr.Workflow
   doctest ExMangaDownloadr
 
   import Mock
 
+  @source "mangareader"
+  @user_agent Application.get_env(:ex_manga_downloadr, :user_agent)
+
   @expected_manga_title "Boku wa Ookami Manga"
-  @expected_chapters {:ok, @expected_manga_title,
-    ["/boku-wa-ookami/1", "/boku-wa-ookami/2", "/boku-wa-ookami/3"]}
-  @expected_pages {:ok,
-    ["/boku-wa-ookami/1", "/boku-wa-ookami/1/2", "/boku-wa-ookami/1/3"]}
+  @expected_chapters ["/boku-wa-ookami/1", "/boku-wa-ookami/2", "/boku-wa-ookami/3"]
+  @expected_pages ["/boku-wa-ookami/1", "/boku-wa-ookami/1/2", "/boku-wa-ookami/1/3"]
   @expected_image {:ok,
     {"http://i3.mangareader.net/boku-wa-ookami/1/boku-wa-ookami-2523599.jpg",
       "Ookami wa Boku 00001 - Page 00001.jpg"}}
 
   test "workflow fetches chapters" do
-    with_mock IndexPage, [chapters: fn(_url) -> @expected_chapters end] do
-      assert {:ok, @expected_manga_title, Workflow.chapters("foo")} == @expected_chapters
+    with_mock :"Elixir.ExMangaDownloadr.MangaReader.IndexPage", [chapters: fn(_url) -> {:ok, @expected_manga_title, @expected_chapters} end] do
+      assert Workflow.chapters(["foo", @source]) == [@expected_chapters, @source]
     end
   end
 
   test "workflow fetches pages from chapters" do
-    with_mock ChapterPage, [pages: fn(_chapter_link) -> @expected_pages end] do
-      assert {:ok, Workflow.pages(["foo"])} == @expected_pages
+    with_mock :"Elixir.ExMangaDownloadr.MangaReader.ChapterPage", [pages: fn(_chapter_link) -> {:ok, @expected_pages} end] do
+      assert Workflow.pages([["foo"], @source]) == [@expected_pages, @source]
     end
   end
 
   test "workflow fetches image sources from pages" do
-    with_mock Page, [image: fn(_page_link) -> @expected_image end] do
+    with_mock :"Elixir.ExMangaDownloadr.MangaReader.Page", [image: fn(_page_link) -> @expected_image end] do
       {:ok, image} = @expected_image
-      assert Workflow.images_sources(["foo"]) == [image]
+      assert Workflow.images_sources([["foo"], @source]) == [image]
     end
   end
 
   test "workflow tries to download the images" do
     with_mock HTTPotion, [get: fn(_url, _options) -> %HTTPotion.Response{ body: nil, headers: nil, status_code: 200 } end] do
-      with_mock File, [write!: fn(_filename, _body) -> nil end] do
+      with_mock File, [write!: fn(_filename, _body) -> nil end,
+                       exists?: fn(_filename) -> false end] do
         assert Workflow.process_downloads([{"http://src_foo", "filename_foo"}], "/tmp") == "/tmp"
 
-        assert called HTTPotion.get("http://src_foo", [timeout: 30_000])
+        assert called HTTPotion.get("http://src_foo", [headers: ["User-Agent": @user_agent], timeout: 60_000])
         assert called File.write!("/tmp/filename_foo", nil)
       end
     end

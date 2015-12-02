@@ -9,11 +9,11 @@ defmodule ExMangaDownloadr.CLI do
 
   defp parse_args(args) do
     parse = OptionParser.parse(args,
-      switches: [name: :string, url: :string, directory: :string],
-      aliases: [n: :name, u: :url, d: :directory]
+      switches: [name: :string, url: :string, directory: :string, source: :string],
+      aliases: [n: :name, u: :url, d: :directory, s: :source]
     )
     case parse do
-      {[name: manga_name, url: url, directory: directory], _, _} -> process(manga_name, url, directory)
+      {[name: manga_name, url: url, directory: directory, source: source], _, _} -> process(manga_name, url, directory, source)
       {[name: manga_name, directory: directory], _, _} -> process(manga_name, directory)
       {_, _, _ } -> process(:help)
     end
@@ -22,17 +22,22 @@ defmodule ExMangaDownloadr.CLI do
   defp process(:help) do
     IO.puts """
       usage:
-        ./ex_manga_downloadr -n boku-wa-ookami -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami
+        ./ex_manga_downloadr -n boku-wa-ookami -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami -s mangareader
+
+      source can be:
+        - mangareader
+        - mangafox
+
       or just to compile the PDFs (if already finished downloading)
         ./ex_manga_downloadr -n boku-wa-ookami -d /tmp/boku-wa-ookami
     """
     System.halt(0)
   end
 
-  defp process(manga_name, url, directory) do
+  defp process(manga_name, url, directory, source) do
     File.mkdir_p!(directory)
 
-    url
+    [url, source]
       |> Workflow.chapters
       |> Workflow.pages
       |> Workflow.images_sources
