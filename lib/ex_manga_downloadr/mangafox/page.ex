@@ -8,21 +8,22 @@ defmodule ExMangaDownloadr.Mangafox.Page do
     case HTTPotion.get(page_link, [
       headers: ["User-Agent": @user_agent, "Accept-encoding": "gzip"], timeout: 30_000]) do
       %HTTPotion.Response{ body: body, headers: headers, status_code: 200 } ->
-        { :ok, fetch_image(ExMangaDownloadr.Mangafox.gunzip(body, headers)) }
+        { :ok, fetch_image(page_link, ExMangaDownloadr.Mangafox.gunzip(body, headers)) }
       _ ->
         { :err, "not found"}
     end
   end
 
-  defp fetch_image(html) do
+  defp fetch_image(page_link, html) do
     html
     |> Floki.find("div[class='read_img'] img")
     |> Enum.map(fn line ->
          case line do
            {"img", [{"src", image_src}, {"onerror", _}, {"width", _},
-                    {"id", "image"}, {"alt", image_alt}], _} ->
-             [file|_tokens] = image_src |> String.split("/") |> Enum.reverse
-             {image_src, "#{image_alt}-#{file}"}
+                    {"id", "image"}, {"alt", _}], _} ->
+             extension = image_src |> String.split(".") |> Enum.reverse |> Enum.at(0)
+             tokens    = page_link |> String.split("/") |> Enum.reverse
+             {image_src, "#{Enum.at(tokens, 2)}-#{Enum.at(tokens, 1)}-#{Enum.at(tokens, 0)}.#{extension}"}
          end
        end)
     |> Enum.at(0)
