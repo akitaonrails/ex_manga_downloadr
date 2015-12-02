@@ -9,7 +9,7 @@ defmodule PoolManagement.Supervisor do
     pool_options = [
       name: {:local, :worker_pool},
       worker_module: PoolManagement.Worker,
-      size: 50,
+      size: 10,
       max_overflow: 0
     ]
 

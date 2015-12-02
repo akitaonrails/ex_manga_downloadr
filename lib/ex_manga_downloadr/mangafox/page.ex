@@ -23,7 +23,8 @@ defmodule ExMangaDownloadr.Mangafox.Page do
                     {"id", "image"}, {"alt", _}], _} ->
              extension = image_src |> String.split(".") |> Enum.reverse |> Enum.at(0)
              tokens    = page_link |> String.split("/") |> Enum.reverse
-             {image_src, "#{Enum.at(tokens, 2)}-#{Enum.at(tokens, 1)}-#{Enum.at(tokens, 0)}.#{extension}"}
+             filename = Enum.at(tokens, 0) |> String.split(".") |> Enum.at(0) |> String.rjust(5, ?0)
+             {image_src, "#{Enum.at(tokens, 2)}-#{Enum.at(tokens, 1)}-#{filename}.#{extension}"}
          end
        end)
     |> Enum.at(0)

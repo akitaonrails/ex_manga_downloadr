@@ -50,7 +50,7 @@ defmodule ExMangaDownloadr.MangafoxTest do
     "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/40.html"]
 
   @expected_image_src "http://z.mfcdn.net/store/manga/14327/001.0/compressed/pnozomi_kimio_020_000.jpg"
-  @expected_image_alt "nozo_x_kimi_2_nensei_hen-c001-1.html.jpg"
+  @expected_image_alt "nozo_x_kimi_2_nensei_hen-c001-00001.jpg"
 
   test "get all chapters available for the manga" do
     {:ok, manga_title, chapter_list} = IndexPage.chapters(@test_manga_url)
