@@ -21,12 +21,17 @@ defmodule ExMangaDownloadr.Mangafox.Page do
          case line do
            {"img", [{"src", image_src}, {"onerror", _}, {"width", _},
                     {"id", "image"}, {"alt", _}], _} ->
-             extension = image_src |> String.split(".") |> Enum.reverse |> Enum.at(0)
-             tokens    = page_link |> String.split("/") |> Enum.reverse
-             filename = Enum.at(tokens, 0) |> String.split(".") |> Enum.at(0) |> String.rjust(5, ?0)
-             {image_src, "#{Enum.at(tokens, 2)}-#{Enum.at(tokens, 1)}-#{filename}.#{extension}"}
+           normalize_metadata(image_src, page_link)
          end
        end)
     |> Enum.at(0)
+  end
+
+  defp normalize_metadata(image_src, page_link) do
+    extension = image_src |> String.split(".") |> Enum.reverse |> Enum.at(0)
+    tokens    = page_link |> String.split("/") |> Enum.reverse
+    filename  = Enum.at(tokens, 0) |> String.split(".") |> Enum.at(0) |> String.rjust(5, ?0)
+    
+    {image_src, "#{Enum.at(tokens, 2)}-#{Enum.at(tokens, 1)}-#{filename}.#{extension}"}
   end
 end

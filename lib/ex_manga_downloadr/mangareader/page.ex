@@ -12,7 +12,8 @@ defmodule ExMangaDownloadr.MangaReader.Page do
   end
 
   defp fetch_image(html) do
-    Floki.find(html, "div[id='imgholder'] img")
+    html
+    |> Floki.find("div[id='imgholder'] img")
     |> Enum.map(fn line ->
          case line do
            {"img", [{"id", _}, {"width", _}, {"height", _},

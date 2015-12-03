@@ -12,12 +12,8 @@ defmodule ExMangaDownloadr.MangaReader.ChapterPage do
   end
 
   defp fetch_pages(html) do
-    Floki.find(html, "select[id='pageMenu'] option")
-    |> Enum.map(fn line ->
-         case line do
-           {"option", [{"value", value}, {"selected", "selected"}], _} -> value
-           {"option", [{"value", value}], _} -> value
-         end
-       end)
+    html
+    |> Floki.find("select[id='pageMenu'] option")
+    |> Floki.attribute("value")
   end
 end

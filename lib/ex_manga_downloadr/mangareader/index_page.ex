@@ -9,13 +9,14 @@ defmodule ExMangaDownloadr.MangaReader.IndexPage do
   end
 
   defp fetch_manga_title(html) do
-    Floki.find(html, "#mangaproperties h1")
-    |> Enum.map(fn {"h1", [], [title]} -> title end)
-    |> Enum.at(0)
+    html
+    |> Floki.find("#mangaproperties h1")
+    |> Floki.text
   end
 
   defp fetch_chapters(html) do
-    Floki.find(html, "#listing a")
-    |> Enum.map fn {"a", [{"href", url}], _} -> url end
+    html
+    |> Floki.find("#listing a")
+    |> Floki.attribute("href")
   end
 end
