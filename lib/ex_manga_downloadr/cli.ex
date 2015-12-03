@@ -1,6 +1,6 @@
 defmodule ExMangaDownloadr.CLI do
   alias ExMangaDownloadr.Workflow
-  require ExMangaDownloadr.DumpMacro
+  require ExMangaDownloadr
 
   def main(args) do
     args
@@ -43,10 +43,12 @@ defmodule ExMangaDownloadr.CLI do
   defp process(manga_name, directory, {_url, _source} = manga_site) do
     File.mkdir_p!(directory)
 
-    images_list = DumpMacro.managed_state directory, manga_site
-      |> Workflow.chapters
-      |> Workflow.pages
-      |> Workflow.images_sources 
+    images_list = ExMangaDownloadr.managed_dump directory do
+        manga_site
+          |> Workflow.chapters
+          |> Workflow.pages
+          |> Workflow.images_sources 
+      end
 
     images_list
       |> Workflow.process_downloads(directory)

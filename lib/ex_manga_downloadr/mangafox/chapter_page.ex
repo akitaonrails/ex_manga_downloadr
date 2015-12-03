@@ -1,14 +1,9 @@
 defmodule ExMangaDownloadr.Mangafox.ChapterPage do
   require Logger
+  require ExMangaDownloadr
 
   def pages(chapter_link) do
-    Logger.debug("Fetching pages from chapter #{chapter_link}")
-    case HTTPotion.get(chapter_link, ExMangaDownloadr.http_headers) do
-      %HTTPotion.Response{ body: body, headers: headers, status_code: 200 } ->
-        { :ok, body |> ExMangaDownloadr.gunzip(headers) |> fetch_pages(chapter_link) }
-      _ ->
-        { :err, "not found"}
-    end
+    ExMangaDownloadr.fetch chapter_link, do: fetch_pages(chapter_link)
   end
 
   defp fetch_pages(html, chapter_link) do

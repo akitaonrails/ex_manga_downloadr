@@ -53,7 +53,7 @@ defmodule ExMangaDownloadr.MangafoxTest do
   @expected_image_alt "nozo_x_kimi_2_nensei_hen-c001-00001.jpg"
 
   test "get all chapters available for the manga" do
-    {:ok, manga_title, chapter_list} = IndexPage.chapters(@test_manga_url)
+    {:ok, {manga_title, chapter_list}} = IndexPage.chapters(@test_manga_url)
     assert manga_title == @manga_title
     assert chapter_list == @expected_chapters
   end

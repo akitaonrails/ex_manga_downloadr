@@ -23,6 +23,36 @@ defmodule ExMangaDownloadr do
     ]
   end
 
+  @doc """
+  Loads a dump of the last images list saved, otherwise go through the
+  unquote(expression) for the lengthy process of fetching this list and
+  then saving the dump, to be used to resume the work later
+  """
+  defmacro managed_dump(directory, do: expression) do
+    quote do
+      dump_file = "#{unquote(directory)}/images_list.dump"
+      images_list = if File.exists?(dump_file) do
+          :erlang.binary_to_term(File.read!(dump_file))
+        else
+          list = unquote(expression)
+          File.write(dump_file, :erlang.term_to_binary(list))
+          list
+        end
+    end
+  end
+
+  defmacro fetch(link, do: expression) do
+    quote do
+      Logger.debug("Fetching from #{unquote(link)}")
+      case HTTPotion.get(unquote(link), ExMangaDownloadr.http_headers) do
+        %HTTPotion.Response{ body: body, headers: headers, status_code: 200 } ->
+          { :ok, body |> ExMangaDownloadr.gunzip(headers) |> unquote(expression) }
+        _ ->
+          { :err, "not found"}
+      end
+    end
+  end
+
   ## Phoenix like "use ExMangaDownloadr, :mangareader" for aliasing
 
   def mangareader do

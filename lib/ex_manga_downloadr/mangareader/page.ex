@@ -1,14 +1,9 @@
 defmodule ExMangaDownloadr.MangaReader.Page do
   require Logger
+  require ExMangaDownloadr
 
   def image(page_link) do
-    Logger.debug("Fetching image source from page #{page_link}")
-    case HTTPotion.get("http://www.mangareader.net#{page_link}", ExMangaDownloadr.http_headers) do
-      %HTTPotion.Response{ body: body, headers: headers, status_code: 200 } ->
-        { :ok, body |> ExMangaDownloadr.gunzip(headers) |> fetch_image }
-      _ ->
-        { :err, "not found"}
-    end
+    ExMangaDownloadr.fetch "http://www.mangareader.net#{page_link}", do: fetch_image
   end
 
   defp fetch_image(html) do
