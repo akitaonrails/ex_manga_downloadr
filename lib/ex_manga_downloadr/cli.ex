@@ -43,7 +43,8 @@ defmodule ExMangaDownloadr.CLI do
   defp process(manga_name, directory, {_url, _source} = manga_site) do
     File.mkdir_p!(directory)
 
-    images_list = ExMangaDownloadr.managed_dump directory do
+    images_list = 
+      ExMangaDownloadr.managed_dump directory do
         manga_site
           |> Workflow.chapters
           |> Workflow.pages
