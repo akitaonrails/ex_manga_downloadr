@@ -18,14 +18,14 @@ defmodule ExMangaDownloadrTest do
   test "workflow fetches chapters" do
     with_mock ExMangaDownloadr.MangaReader.IndexPage,
       [chapters: fn(_url) -> {:ok, @expected_manga_title, @expected_chapters} end] do
-      assert Workflow.chapters(["foo", @source]) == [@expected_chapters, @source]
+      assert Workflow.chapters({"foo", @source}) == {@expected_chapters, @source}
     end
   end
 
   test "workflow fetches pages from chapters" do
     with_mock ExMangaDownloadr.MangaReader.ChapterPage,
       [pages: fn(_chapter_link) -> {:ok, @expected_pages} end] do
-      assert Workflow.pages([["foo"], @source]) == [@expected_pages, @source]
+      assert Workflow.pages({["foo"], @source}) == {@expected_pages, @source}
     end
   end
 
@@ -33,7 +33,7 @@ defmodule ExMangaDownloadrTest do
     with_mock ExMangaDownloadr.MangaReader.Page,
       [image: fn(_page_link) -> @expected_image end] do
       {:ok, image} = @expected_image
-      assert Workflow.images_sources([["foo"], @source]) == [image]
+      assert Workflow.images_sources({["foo"], @source}) == [image]
     end
   end
 

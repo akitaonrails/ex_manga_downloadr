@@ -14,7 +14,7 @@ defmodule ExMangaDownloadr.CLI do
       aliases: [n: :name, u: :url, d: :directory, s: :source]
     )
     case parse do
-      {[name: manga_name, url: url, directory: directory, source: source], _, _} -> process(manga_name, url, directory, source)
+      {[name: manga_name, url: url, directory: directory, source: source], _, _} -> process(manga_name, directory, {url, source})
       {[name: manga_name, directory: directory], _, _} -> process(manga_name, directory)
       {_, _, _ } -> process(:help)
     end
@@ -40,10 +40,10 @@ defmodule ExMangaDownloadr.CLI do
     System.halt(0)
   end
 
-  defp process(manga_name, url, directory, source) do
+  defp process(manga_name, directory, {_url, _source} = manga_site) do
     File.mkdir_p!(directory)
 
-    images_list = DumpMacro.managed_state directory, [url, source]
+    images_list = DumpMacro.managed_state directory, manga_site
       |> Workflow.chapters
       |> Workflow.pages
       |> Workflow.images_sources 

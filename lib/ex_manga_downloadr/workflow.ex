@@ -7,20 +7,20 @@ defmodule ExMangaDownloadr.Workflow do
   @await_timeout_ms       1_000_000 # has to wait for huge number of async Tasks at once
   @maximum_pdf_generation 2 # the best value is probably the total number of CPU cores
 
-  def chapters([url, source]) do
+  def chapters({url, source}) do
     {:ok, _manga_title, chapter_list} = Worker.index_page(url, source)
-    [chapter_list, source]
+    {chapter_list, source}
   end
 
-  def pages([chapter_list, source]) do
+  def pages({chapter_list, source}) do
     pages_list = chapter_list
       |> Enum.map(&Worker.chapter_page([&1, source]))
       |> Enum.map(&Task.await(&1, @await_timeout_ms))
       |> Enum.reduce([], fn {:ok, list}, acc -> acc ++ list end)
-    [pages_list, source]
+    {pages_list, source}
   end
 
-  def images_sources([pages_list, source]) do
+  def images_sources({pages_list, source}) do
     pages_list
       |> Enum.map(&Worker.page_image([&1, source]))
       |> Enum.map(&Task.await(&1, @await_timeout_ms))
