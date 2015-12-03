@@ -1,6 +1,6 @@
 defmodule ExMangaDownloadr.MangaReaderTest do
   use ExUnit.Case
-  use ExMangaDownloadr.MangaReader
+  use ExMangaDownloadr, :mangareader
 
   @test_manga_url "http://www.mangareader.net/onepunch-man"
   @manga_title "Onepunch-Man Manga"

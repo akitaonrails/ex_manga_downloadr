@@ -1,6 +1,6 @@
 defmodule ExMangaDownloadr.MangafoxTest do
   use ExUnit.Case
-  use ExMangaDownloadr.Mangafox
+  use ExMangaDownloadr, :mangafox
 
   @test_manga_url "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/"
   @manga_title "NOZO X KIMI - 2-NENSEI HEN Manga"
