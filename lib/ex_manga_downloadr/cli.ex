@@ -25,12 +25,17 @@ defmodule ExMangaDownloadr.CLI do
       usage:
         ./ex_manga_downloadr -n boku-wa-ookami -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami -s mangareader
 
-      source can be:
+      sources can be:
         - mangareader
         - mangafox
 
       or just to compile the PDFs (if already finished downloading)
         ./ex_manga_downloadr -n boku-wa-ookami -d /tmp/boku-wa-ookami
+
+      as mangafox doesn't support too much concurrency optimize down like this:
+        POOL_SIZE=10 ./ex_manga_downloadr -n onepunch -u http://mangafox.me/manga/onepunch_man/ -d /tmp/onepunch -s mangafox
+
+      this tool optimizes to avoid doing every step again all the time, it saves a dump files in the provided directory to resume and it doesn't download images that already exists.
     """
     System.halt(0)
   end

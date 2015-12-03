@@ -16,26 +16,30 @@ defmodule ExMangaDownloadrTest do
       "Ookami wa Boku 00001 - Page 00001.jpg"}}
 
   test "workflow fetches chapters" do
-    with_mock :"Elixir.ExMangaDownloadr.MangaReader.IndexPage", [chapters: fn(_url) -> {:ok, @expected_manga_title, @expected_chapters} end] do
+    with_mock ExMangaDownloadr.MangaReader.IndexPage,
+      [chapters: fn(_url) -> {:ok, @expected_manga_title, @expected_chapters} end] do
       assert Workflow.chapters(["foo", @source]) == [@expected_chapters, @source]
     end
   end
 
   test "workflow fetches pages from chapters" do
-    with_mock :"Elixir.ExMangaDownloadr.MangaReader.ChapterPage", [pages: fn(_chapter_link) -> {:ok, @expected_pages} end] do
+    with_mock ExMangaDownloadr.MangaReader.ChapterPage,
+      [pages: fn(_chapter_link) -> {:ok, @expected_pages} end] do
       assert Workflow.pages([["foo"], @source]) == [@expected_pages, @source]
     end
   end
 
   test "workflow fetches image sources from pages" do
-    with_mock :"Elixir.ExMangaDownloadr.MangaReader.Page", [image: fn(_page_link) -> @expected_image end] do
+    with_mock ExMangaDownloadr.MangaReader.Page,
+      [image: fn(_page_link) -> @expected_image end] do
       {:ok, image} = @expected_image
       assert Workflow.images_sources([["foo"], @source]) == [image]
     end
   end
 
   test "workflow tries to download the images" do
-    with_mock HTTPotion, [get: fn(_url, _options) -> %HTTPotion.Response{ body: nil, headers: nil, status_code: 200 } end] do
+    with_mock HTTPotion,
+      [get: fn(_url, _options) -> %HTTPotion.Response{ body: nil, headers: nil, status_code: 200 } end] do
       with_mock File, [write!: fn(_filename, _body) -> nil end,
                        exists?: fn(_filename) -> false end] do
         assert Workflow.process_downloads([{"http://src_foo", "filename_foo"}], "/tmp") == "/tmp"
@@ -43,6 +47,12 @@ defmodule ExMangaDownloadrTest do
         assert called HTTPotion.get("http://src_foo", [headers: ["User-Agent": @user_agent], timeout: 60_000])
         assert called File.write!("/tmp/filename_foo", nil)
       end
+    end
+  end
+
+  test "workflow skips existing images" do
+    with_mock File, [exists?: fn(_filename) -> true end] do
+      assert Workflow.process_downloads([{"http://src_foo", "filename_foo"}], "/tmp") == "/tmp"
     end
   end
 

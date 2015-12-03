@@ -7,7 +7,7 @@ defmodule ExMangaDownloadr.Mangafox.ChapterPage do
     Logger.debug("Fetching pages from chapter #{chapter_link}")
     case HTTPotion.get(chapter_link, [headers: ["User-Agent": @user_agent, "Accept-encoding": "gzip"], timeout: 30_000]) do
       %HTTPotion.Response{ body: body, headers: headers, status_code: 200 } ->
-        body = ExMangaDownloadr.Mangafox.gunzip(body, headers)
+        body = ExMangaDownloadr.gunzip(body, headers)
         { :ok, fetch_pages(chapter_link, body) }
       _ ->
         { :err, "not found"}
@@ -19,15 +19,12 @@ defmodule ExMangaDownloadr.Mangafox.ChapterPage do
 
     html
     |> Floki.find("div[id='top_center_bar'] option")
-    |> Enum.map(fn line ->
-         case line do
-           {"option", [{"value", value}, {"selected", "selected"}], _} -> value
-           {"option", [{"value", value}], _} -> value
-         end
-       end)
+    |> Floki.attribute("value")
     |> Enum.reject(fn page_number -> page_number == "0" end)
     |> Enum.map(fn page_number -> 
-      ["#{page_number}.html"|link_template] |> Enum.reverse |> Enum.join("/")
+      ["#{page_number}.html"|link_template]
+        |> Enum.reverse
+        |> Enum.join("/")
     end)
   end
 end

@@ -8,7 +8,7 @@ defmodule ExMangaDownloadr.Mangafox.Page do
     case HTTPotion.get(page_link, [
       headers: ["User-Agent": @user_agent, "Accept-encoding": "gzip"], timeout: 30_000]) do
       %HTTPotion.Response{ body: body, headers: headers, status_code: 200 } ->
-        { :ok, fetch_image(page_link, ExMangaDownloadr.Mangafox.gunzip(body, headers)) }
+        { :ok, fetch_image(page_link, ExMangaDownloadr.gunzip(body, headers)) }
       _ ->
         { :err, "not found"}
     end
@@ -31,7 +31,7 @@ defmodule ExMangaDownloadr.Mangafox.Page do
     extension = image_src |> String.split(".") |> Enum.reverse |> Enum.at(0)
     tokens    = page_link |> String.split("/") |> Enum.reverse
     filename  = Enum.at(tokens, 0) |> String.split(".") |> Enum.at(0) |> String.rjust(5, ?0)
-    
+
     {image_src, "#{Enum.at(tokens, 2)}-#{Enum.at(tokens, 1)}-#{filename}.#{extension}"}
   end
 end

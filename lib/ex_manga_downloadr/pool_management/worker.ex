@@ -1,7 +1,5 @@
 defmodule PoolManagement.Worker do
   use GenServer
-  use ExMangaDownloadr.MangaReader
-  use ExMangaDownloadr.Mangafox
   require Logger
 
   @user_agent Application.get_env(:ex_manga_downloadr, :user_agent)
@@ -17,8 +15,8 @@ defmodule PoolManagement.Worker do
   # Public APIs
   def manga_source(source, module) do
     case source do
-      "mangareader" -> String.to_atom("Elixir.ExMangaDownloadr.MangaReader.#{module}")
-      "mangafox"    -> String.to_atom("Elixir.ExMangaDownloadr.Mangafox.#{module}")
+      "mangareader" -> :"Elixir.ExMangaDownloadr.MangaReader.#{module}"
+      "mangafox"    -> :"Elixir.ExMangaDownloadr.Mangafox.#{module}"
     end
   end
 
