@@ -1,20 +1,17 @@
 defmodule ExMangaDownloadr.Mangafox.Page do
   require Logger
 
-  @user_agent Application.get_env(:ex_manga_downloadr, :user_agent)
-
   def image(page_link) do
     Logger.debug("Fetching image source from page #{page_link}")
-    case HTTPotion.get(page_link, [
-      headers: ["User-Agent": @user_agent, "Accept-encoding": "gzip"], timeout: 30_000]) do
+    case HTTPotion.get(page_link, ExMangaDownloadr.http_headers) do
       %HTTPotion.Response{ body: body, headers: headers, status_code: 200 } ->
-        { :ok, fetch_image(page_link, ExMangaDownloadr.gunzip(body, headers)) }
+        { :ok, body |> ExMangaDownloadr.gunzip(headers) |> fetch_image(page_link) }
       _ ->
         { :err, "not found"}
     end
   end
 
-  defp fetch_image(page_link, html) do
+  defp fetch_image(html, page_link) do
     html
     |> Floki.find("div[class='read_img'] img")
     |> Enum.map(&normalize_metadata(&1, page_link))

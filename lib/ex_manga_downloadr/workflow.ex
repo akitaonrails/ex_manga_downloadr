@@ -8,9 +8,7 @@ defmodule ExMangaDownloadr.Workflow do
   @maximum_pdf_generation 2 # the best value is probably the total number of CPU cores
 
   def chapters([url, source]) do
-    {:ok, _manga_title, chapter_list} = source
-      |> Worker.manga_source("IndexPage")
-      |> apply(:chapters, [url])
+    {:ok, _manga_title, chapter_list} = Worker.index_page(url, source)
     [chapter_list, source]
   end
 

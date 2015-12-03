@@ -2,9 +2,6 @@ defmodule PoolManagement.Worker do
   use GenServer
   require Logger
 
-  @user_agent Application.get_env(:ex_manga_downloadr, :user_agent)
-  @http_timeout 60_000
-
   @timeout_ms 1_000_000
   @transaction_timeout_ms 1_000_000 # larger just to be safe
 
@@ -13,11 +10,11 @@ defmodule PoolManagement.Worker do
   end
 
   # Public APIs
-  def manga_source(source, module) do
-    case source do
-      "mangareader" -> :"Elixir.ExMangaDownloadr.MangaReader.#{module}"
-      "mangafox"    -> :"Elixir.ExMangaDownloadr.Mangafox.#{module}"
-    end
+
+  def index_page(url, source) do
+    source 
+      |> manga_source("IndexPage")
+      |> apply(:chapters, [url])
   end
 
   def chapter_page([chapter_link, source]) do
@@ -64,6 +61,15 @@ defmodule PoolManagement.Worker do
     {:reply, download_image(image_data, directory), state}
   end
 
+  ## Helper functions
+
+  defp manga_source(source, module) do
+    case source do
+      "mangareader" -> :"Elixir.ExMangaDownloadr.MangaReader.#{module}"
+      "mangafox"    -> :"Elixir.ExMangaDownloadr.Mangafox.#{module}"
+    end
+  end
+
   defp download_image({image_src, image_filename}, directory) do
     filename = "#{directory}/#{image_filename}"
     if File.exists?(filename) do
@@ -71,8 +77,7 @@ defmodule PoolManagement.Worker do
       {:ok, image_src, filename}
     else
       Logger.debug("Downloading image #{image_src} to #{filename}")
-      case HTTPotion.get(image_src,
-        [headers: ["User-Agent": @user_agent], timeout: @http_timeout]) do
+      case HTTPotion.get(image_src, ExMangaDownloadr.http_headers) do
         %HTTPotion.Response{ body: body, headers: _headers, status_code: 200 } ->
           File.write!(filename, body)
           {:ok, image_src, filename}

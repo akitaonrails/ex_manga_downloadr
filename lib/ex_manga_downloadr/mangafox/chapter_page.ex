@@ -1,20 +1,17 @@
 defmodule ExMangaDownloadr.Mangafox.ChapterPage do
   require Logger
 
-  @user_agent Application.get_env(:ex_manga_downloadr, :user_agent)
-
   def pages(chapter_link) do
     Logger.debug("Fetching pages from chapter #{chapter_link}")
-    case HTTPotion.get(chapter_link, [headers: ["User-Agent": @user_agent, "Accept-encoding": "gzip"], timeout: 30_000]) do
+    case HTTPotion.get(chapter_link, ExMangaDownloadr.http_headers) do
       %HTTPotion.Response{ body: body, headers: headers, status_code: 200 } ->
-        body = ExMangaDownloadr.gunzip(body, headers)
-        { :ok, fetch_pages(chapter_link, body) }
+        { :ok, body |> ExMangaDownloadr.gunzip(headers) |> fetch_pages(chapter_link) }
       _ ->
         { :err, "not found"}
     end
   end
 
-  defp fetch_pages(chapter_link, html) do
+  defp fetch_pages(html, chapter_link) do
     [_page|link_template] = chapter_link |> String.split("/") |> Enum.reverse
 
     html
