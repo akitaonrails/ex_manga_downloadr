@@ -2,8 +2,8 @@ defmodule PoolManagement.Worker do
   use GenServer
   require Logger
 
-  @timeout_ms 1_000_000
-  @transaction_timeout_ms 1_000_000 # larger just to be safe
+  @genserver_call_timeout 1_000_000
+  @task_async_timeout     1_000_000
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, nil, [])
@@ -12,6 +12,7 @@ defmodule PoolManagement.Worker do
   # Public APIs
 
   def index_page(url, source) do
+    # this is not a wrapper to a handle_call but adding in the Worker because it is more relatable
     source 
       |> manga_source("IndexPage")
       |> apply(:chapters, [url])
@@ -20,24 +21,24 @@ defmodule PoolManagement.Worker do
   def chapter_page([chapter_link, source]) do
     Task.async fn -> 
       :poolboy.transaction :worker_pool, fn(server) ->
-        GenServer.call(server, {:chapter_page, chapter_link, source}, @timeout_ms)
-      end, @transaction_timeout_ms
+        GenServer.call(server, {:chapter_page, chapter_link, source}, @genserver_call_timeout)
+      end, @task_async_timeout
     end
   end
 
   def page_image([page_link, source]) do
     Task.async fn -> 
       :poolboy.transaction :worker_pool, fn(server) ->
-        GenServer.call(server, {:page_image, page_link, source}, @timeout_ms)
-      end, @transaction_timeout_ms
+        GenServer.call(server, {:page_image, page_link, source}, @genserver_call_timeout)
+      end, @task_async_timeout
     end
   end
 
   def page_download_image(image_data, directory) do
     Task.async fn -> 
       :poolboy.transaction :worker_pool, fn(server) ->
-        GenServer.call(server, {:page_download_image, image_data, directory}, @timeout_ms)
-      end, @transaction_timeout_ms
+        GenServer.call(server, {:page_download_image, image_data, directory}, @genserver_call_timeout)
+      end, @task_async_timeout
     end
   end
 
