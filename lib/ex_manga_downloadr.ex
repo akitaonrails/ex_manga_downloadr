@@ -34,7 +34,13 @@ defmodule ExMangaDownloadr do
   def retryable_http_get(url, retries \\ @max_retries) when retries > 0 do
     try do
       Logger.debug("Fetching from #{url} for the #{@max_retries - retries} time.")
-      HTTPotion.get(url, ExMangaDownloadr.http_headers)
+      response = HTTPotion.get(url, ExMangaDownloadr.http_headers)
+      case response do
+        %HTTPotion.Response{ body: _, headers: _, status_code: status } when status > 499 ->
+          raise %HTTPotion.HTTPError{message: "req_timedout"}
+        _ ->
+          response
+      end
     rescue
       error in HTTPotion.HTTPError ->
         case error do
