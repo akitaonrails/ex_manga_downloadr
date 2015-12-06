@@ -1,6 +1,12 @@
 defmodule ExMangaDownloadr do
+  require Logger
+
   @user_agent   Application.get_env(:ex_manga_downloadr, :user_agent)
   @http_timeout 60_000
+
+  # will retry failed fetches over 50 times, sleeping 1 second between each retry
+  @max_retries  50
+  @time_to_wait_to_fetch_again 1_000
 
   @doc """
   All HTTPotion.Response bodies should go through this gunzip process
@@ -18,9 +24,25 @@ defmodule ExMangaDownloadr do
   """
   def http_headers do
     [
-      headers: ["User-Agent": @user_agent, "Accept-encoding": "gzip"],
+      headers: ["User-Agent": @user_agent, "Accept-encoding": "gzip", "Connection": "keep-alive"],
       timeout: @http_timeout
     ]
+  end
+
+  def retryable_http_get(url, 0), do: raise "Failed to fetch from #{url} after #{@max_retries} retries."
+  def retryable_http_get(url, retries \\ @max_retries) when retries > 0 do
+    try do
+      Logger.debug("Fetching from #{url} for the #{@max_retries - retries} time.")
+      HTTPotion.get(url, ExMangaDownloadr.http_headers)
+    rescue
+      error in HTTPotion.HTTPError ->
+        case error do
+          %HTTPotion.HTTPError{message: message} when message in ["retry_later", "connection_closing", "req_timedout"] ->
+            :timer.sleep(@time_to_wait_to_fetch_again)
+            retryable_http_get(url, retries - 1)
+          _ -> raise error
+        end
+    end
   end
 
   @doc """
@@ -43,12 +65,9 @@ defmodule ExMangaDownloadr do
 
   defmacro fetch(link, do: expression) do
     quote do
-      Logger.debug("Fetching from #{unquote(link)}")
-      case HTTPotion.get(unquote(link), ExMangaDownloadr.http_headers) do
+      case ExMangaDownloadr.retryable_http_get(unquote(link)) do
         %HTTPotion.Response{ body: body, headers: headers, status_code: 200 } ->
           { :ok, body |> ExMangaDownloadr.gunzip(headers) |> unquote(expression) }
-        _ ->
-          { :err, "not found"}
       end
     end
   end

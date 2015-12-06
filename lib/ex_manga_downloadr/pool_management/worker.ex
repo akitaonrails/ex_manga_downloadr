@@ -74,16 +74,13 @@ defmodule PoolManagement.Worker do
   defp download_image({image_src, image_filename}, directory) do
     filename = "#{directory}/#{image_filename}"
     if File.exists?(filename) do
-      Logger.debug("Image #{filename} already downloaded, skipping.")
+      Logger.debug("Skipping image #{filename}; already downloaded.")
       {:ok, image_src, filename}
     else
-      Logger.debug("Downloading image #{image_src} to #{filename}")
-      case HTTPotion.get(image_src, ExMangaDownloadr.http_headers) do
+      case ExMangaDownloadr.retryable_http_get(image_src) do
         %HTTPotion.Response{ body: body, headers: _headers, status_code: 200 } ->
           File.write!(filename, body)
           {:ok, image_src, filename}
-        _ ->
-          {:err, image_src}
       end
     end
   end
