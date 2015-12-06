@@ -28,7 +28,7 @@ This can be compiled as a command line tool:
 
         ./ex_manga_downloadr -n boku-wa-ookami -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami -s mangareader
 
-You can choose between "mangareader" and "mangafox" as sources. But the Mangafox CDN seems to restrict the amount of concurrent requests from the same origin, so you might want to downgrade from the default 50 concurrent processes to around 10, like this:
+Mangafox CDN seems to restrict the amount of concurrent requests from the same origin, so if you're seeing too many crashes due to requests being denied, you can try to downgrade the maximum number of concurrent connections like this:
 
         POOL_SIZE=10 ./ex_manga_downloadr -n onepunch -u http://mangafox.me/manga/onepunch_man/ -d /tmp/onepunch -s mangafox
 

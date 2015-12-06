@@ -7,6 +7,7 @@ defmodule ExMangaDownloadr do
   # will retry failed fetches over 50 times, sleeping 1 second between each retry
   @max_retries  50
   @time_to_wait_to_fetch_again 1_000
+  @http_errors ["retry_later", "connection_closing", "req_timedout"]
 
   @doc """
   All HTTPotion.Response bodies should go through this gunzip process
@@ -37,7 +38,7 @@ defmodule ExMangaDownloadr do
     rescue
       error in HTTPotion.HTTPError ->
         case error do
-          %HTTPotion.HTTPError{message: message} when message in ["retry_later", "connection_closing", "req_timedout"] ->
+          %HTTPotion.HTTPError{message: message} when message in @http_errors ->
             :timer.sleep(@time_to_wait_to_fetch_again)
             retryable_http_get(url, retries - 1)
           _ -> raise error
