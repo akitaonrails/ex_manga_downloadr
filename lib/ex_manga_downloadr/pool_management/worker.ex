@@ -19,27 +19,27 @@ defmodule PoolManagement.Worker do
   end
 
   def chapter_page([chapter_link, source]) do
-    Task.async fn -> 
+    Task.Supervisor.async(Fetcher.TaskSupervisor, fn ->
       :poolboy.transaction :worker_pool, fn(server) ->
         GenServer.call(server, {:chapter_page, chapter_link, source}, @genserver_call_timeout)
       end, @task_async_timeout
-    end
+    end)
   end
 
   def page_image([page_link, source]) do
-    Task.async fn -> 
+    Task.Supervisor.async(Fetcher.TaskSupervisor, fn ->
       :poolboy.transaction :worker_pool, fn(server) ->
         GenServer.call(server, {:page_image, page_link, source}, @genserver_call_timeout)
       end, @task_async_timeout
-    end
+    end)
   end
 
   def page_download_image(image_data, directory) do
-    Task.async fn -> 
+    Task.Supervisor.async(Fetcher.TaskSupervisor, fn ->
       :poolboy.transaction :worker_pool, fn(server) ->
         GenServer.call(server, {:page_download_image, image_data, directory}, @genserver_call_timeout)
       end, @task_async_timeout
-    end
+    end)
   end
 
   # internal GenServer implementation

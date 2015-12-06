@@ -15,6 +15,7 @@ defmodule PoolManagement.Supervisor do
     ]
 
     children = [
+      supervisor(Task.Supervisor, [[name: Fetcher.TaskSupervisor, strategy: :transient, max_restarts: 10]]),
       :poolboy.child_spec(:worker_pool, pool_options, [])
     ]
 
