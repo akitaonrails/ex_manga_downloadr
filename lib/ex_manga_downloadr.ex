@@ -52,24 +52,6 @@ defmodule ExMangaDownloadr do
     end
   end
 
-  @doc """
-  Loads a dump of the last images list saved, otherwise go through the
-  unquote(expression) for the lengthy process of fetching this list and
-  then saving the dump, to be used to resume the work later
-  """
-  defmacro managed_dump(directory, do: expression) do
-    quote do
-      dump_file = "#{unquote(directory)}/images_list.dump"
-      images_list = if File.exists?(dump_file) do
-          :erlang.binary_to_term(File.read!(dump_file))
-        else
-          list = unquote(expression)
-          File.write(dump_file, :erlang.term_to_binary(list))
-          list
-        end
-    end
-  end
-
   defmacro fetch(link, do: expression) do
     quote do
       case ExMangaDownloadr.retryable_http_get(unquote(link)) do

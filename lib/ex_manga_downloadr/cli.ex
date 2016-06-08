@@ -10,12 +10,12 @@ defmodule ExMangaDownloadr.CLI do
 
   defp parse_args(args) do
     parse = OptionParser.parse(args,
-      switches: [name: :string, url: :string, directory: :string, source: :string],
-      aliases: [n: :name, u: :url, d: :directory, s: :source]
+      switches: [url: :string, directory: :string, test: :boolean],
+      aliases: [u: :url, d: :directory, t: :boolean]
     )
     case parse do
-      {[name: manga_name, url: url, directory: directory, source: source], _, _} -> process(manga_name, directory, {url, source})
-      {[name: manga_name, directory: directory], _, _} -> process(manga_name, directory)
+      {[test: true], _, _} -> process_test("/tmp/ex_one_punch_man", "http://www.mangareader.net/onepunch-man")
+      {[url: url, directory: directory], _, _} -> process(directory, url)
       {_, _, _ } -> process(:help)
     end
   end
@@ -23,46 +23,47 @@ defmodule ExMangaDownloadr.CLI do
   defp process(:help) do
     IO.puts """
       usage:
-        ./ex_manga_downloadr -n boku-wa-ookami -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami -s mangareader
+        ./ex_manga_downloadr -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami
 
-      sources can be:
-        - mangareader
-        - mangafox
+      as mangafox doesn't support too much concurrency, slow it down like this:
+        POOL_SIZE=10 ./ex_manga_downloadr -u http://mangafox.me/manga/onepunch_man/ -d /tmp/onepunch
 
-      or just to compile the PDFs (if already finished downloading)
-        ./ex_manga_downloadr -n boku-wa-ookami -d /tmp/boku-wa-ookami
+      to benchmark you use the test mode like this:
 
-      as mangafox doesn't support too much concurrency optimize down like this:
-        POOL_SIZE=10 ./ex_manga_downloadr -n onepunch -u http://mangafox.me/manga/onepunch_man/ -d /tmp/onepunch -s mangafox
+        ./ex_manga_downloadr --test
 
-      this tool optimizes to avoid doing every step again all the time, it saves a dump files in the provided directory to resume and it doesn't download images that already exists.
+      this will use One-Punch Man as a sample test and skip the actual download, optimize and compile pdf steps.
     """
     System.halt(0)
   end
 
-  defp process(manga_name, directory, {_url, _source} = manga_site) do
+  defp process(directory, url) do
     File.mkdir_p!(directory)
+    File.mkdir_p!("/tmp/ex_manga_downloadr_cache")
 
-    images_list = 
-      ExMangaDownloadr.managed_dump directory do
-        manga_site
-          |> Workflow.chapters
-          |> Workflow.pages
-          |> Workflow.images_sources 
-      end
-
-    images_list
+    manga_name = directory |> String.split("/") |> Enum.reverse |> Enum.at(0)
+    url
+      |> Workflow.determine_source
+      |> Workflow.chapters
+      |> Workflow.pages
+      |> Workflow.images_sources
       |> Workflow.process_downloads(directory)
       |> Workflow.optimize_images
       |> Workflow.compile_pdfs(manga_name)
       |> finish_process
   end
 
-  defp process(manga_name, directory) do
-    IO.puts "Just going to compile PDFs."
+  defp process_test(directory, url) do
+    File.mkdir_p!(directory)
+    File.mkdir_p!("/tmp/ex_manga_downloadr_cache")
+
+    url
+      |> Workflow.determine_source
+      |> Workflow.chapters
+      |> Workflow.pages
+      |> Workflow.images_sources
 
     directory
-      |> Workflow.compile_pdfs(manga_name)
       |> finish_process
   end
 

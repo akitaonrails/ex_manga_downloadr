@@ -7,6 +7,19 @@ defmodule ExMangaDownloadr.Workflow do
   @await_timeout_ms       1_000_000 # has to wait for huge number of async Tasks at once
   @maximum_pdf_generation 2 # the best value is probably the total number of CPU cores
 
+  def determine_source(url) do
+    source = cond do
+      Regex.match?(~r/mangareader\.net/, url) ->
+        "mangareader"
+      Regex.match?(~r/mangafox\.me/, url) ->
+        "mangafox"
+      true ->
+        IO.puts "Wasn't able to determine the manga source, URL invalid."
+        System.halt(0)
+    end
+    {url, source}
+  end
+
   def chapters({url, source}) do
     {:ok, {_manga_title, chapter_list}} = Worker.index_page(url, source)
     {chapter_list, source}
@@ -49,12 +62,12 @@ defmodule ExMangaDownloadr.Workflow do
       |> chunk(@pages_per_volume)
       |> Enum.with_index
       |> chunk(@maximum_pdf_generation)
-      |> Enum.map(fn batch -> 
+      |> Enum.map(fn batch ->
         batch
           |> Enum.map(&(compile_volume(manga_name, directory, &1)))
           |> Enum.map(&(Task.await(&1, @await_timeout_ms)))
       end)
-      
+
     directory
   end
 
