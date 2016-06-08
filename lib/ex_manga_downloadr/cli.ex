@@ -25,14 +25,20 @@ defmodule ExMangaDownloadr.CLI do
       usage:
         ./ex_manga_downloadr -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami
 
-      as mangafox doesn't support too much concurrency, slow it down like this:
+      As mangafox doesn't support too much concurrency, slow it down like this:
         POOL_SIZE=10 ./ex_manga_downloadr -u http://mangafox.me/manga/onepunch_man/ -d /tmp/onepunch
 
-      to benchmark you use the test mode like this:
+      To benchmark you use the test mode like this:
 
         ./ex_manga_downloadr --test
 
       this will use One-Punch Man as a sample test and skip the actual download, optimize and compile pdf steps.
+
+      You can also turn on cache mode like this:
+
+        CACHE_HTTP=true ./ex_manga_downloadr  -u http://www.mangareader.net/boku-wa-ookami -d /tmp/boku-wa-ookami
+
+      That way you can resume operations if you had to interrupt it before.
     """
     System.halt(0)
   end

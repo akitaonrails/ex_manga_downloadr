@@ -34,11 +34,22 @@ defmodule ExMangaDownloadr do
   def retryable_http_get(url, retries \\ @max_retries) when retries > 0 do
     try do
       Logger.debug("Fetching from #{url} for the #{@max_retries - retries} time.")
-      response = HTTPotion.get(url, ExMangaDownloadr.http_headers)
+      cache_path = "/tmp/ex_manga_downloadr_cache/#{cache_filename(url)}"
+      response = if System.get_env("CACHE_HTTP") && File.exists?(cache_path) do
+        {:ok, body} = File.read(cache_path)
+        %HTTPotion.Response{ body: body, headers: [ "Content-Encoding": "" ], status_code: 200}
+      else
+        HTTPotion.get(url, ExMangaDownloadr.http_headers)
+      end
       case response do
-        %HTTPotion.Response{ body: _, headers: _, status_code: status } when status > 499 ->
+        %HTTPotion.Response{ body: body, headers: _, status_code: status } when status > 499 ->
           raise %HTTPotion.HTTPError{message: "req_timedout"}
-        _ ->
+        %HTTPotion.Response{ body: _, headers: headers, status_code: status} when status > 300 and status < 400 ->
+          retryable_http_get(headers["Location"], retries)
+        %HTTPotion.Response{ body: body, headers: headers, status_code: _ } ->
+          if System.get_env("CACHE_HTTP") && !File.exists?(cache_path) do
+            File.write!(cache_path, gunzip(body, headers))
+          end
           response
       end
     rescue
@@ -50,6 +61,10 @@ defmodule ExMangaDownloadr do
           _ -> raise error
         end
     end
+  end
+
+  defp cache_filename(url) do
+    :crypto.hash(:md5, url) |> Base.encode16
   end
 
   defmacro fetch(link, do: expression) do
