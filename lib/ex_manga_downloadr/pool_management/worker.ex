@@ -13,7 +13,7 @@ defmodule PoolManagement.Worker do
 
   def index_page(url, source) do
     # this is not a wrapper to a handle_call but adding in the Worker because it is more relatable
-    source 
+    source
       |> manga_source("IndexPage")
       |> apply(:chapters, [url])
   end

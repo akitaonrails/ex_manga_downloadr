@@ -33,7 +33,6 @@ defmodule ExMangaDownloadr do
   def retryable_http_get(url, 0), do: raise "Failed to fetch from #{url} after #{@max_retries} retries."
   def retryable_http_get(url, retries \\ @max_retries) when retries > 0 do
     try do
-      Logger.debug("Fetching from #{url} for the #{@max_retries - retries} time.")
       cache_path = "/tmp/ex_manga_downloadr_cache/#{cache_filename(url)}"
       response = if System.get_env("CACHE_HTTP") && File.exists?(cache_path) do
         {:ok, body} = File.read(cache_path)
