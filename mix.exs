@@ -30,12 +30,12 @@ defmodule ExMangaDownloadr.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
-      {:httpotion, "~> 2.1.0"},
-      {:floki, "~> 0.7"},
-      {:porcelain, "~> 2.0"},
-      {:poolboy, github: "devinus/poolboy", tag: "1.5.1"},
-      {:mock, "~> 0.1.1", only: :test}
+      {:ibrowse, "~> 4.2.2"},
+      {:httpotion, "~> 3.0.0"},
+      {:floki, "~> 0.9.0"},
+      {:porcelain, "~> 2.0.1"},
+      {:poolboy, "~> 1.5.1"},
+      {:mock, "~> 0.1.3", only: :test}
     ]
   end
 end
