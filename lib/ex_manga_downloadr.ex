@@ -30,8 +30,9 @@ defmodule ExMangaDownloadr do
     ]
   end
 
+  def retryable_http_get(url, retries \\ @max_retries)
   def retryable_http_get(url, 0), do: raise "Failed to fetch from #{url} after #{@max_retries} retries."
-  def retryable_http_get(url, retries \\ @max_retries) when retries > 0 do
+  def retryable_http_get(url, retries) when retries > 0 do
     try do
       cache_path = "/tmp/ex_manga_downloadr_cache/#{cache_filename(url)}"
       response = if System.get_env("CACHE_HTTP") && File.exists?(cache_path) do
@@ -41,7 +42,7 @@ defmodule ExMangaDownloadr do
         HTTPotion.get(url, ExMangaDownloadr.http_headers)
       end
       case response do
-        %HTTPotion.Response{ body: body, headers: _, status_code: status } when status > 499 ->
+        %HTTPotion.Response{ body: _, headers: _, status_code: status } when status > 499 ->
           raise %HTTPotion.HTTPError{message: "req_timedout"}
         %HTTPotion.Response{ body: _, headers: headers, status_code: status} when status > 300 and status < 400 ->
           retryable_http_get(headers["Location"], retries)
