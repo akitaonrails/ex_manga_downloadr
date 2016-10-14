@@ -68,6 +68,7 @@ defmodule ExMangaDownloadr.CLI do
       |> Workflow.chapters
       |> Workflow.pages
       |> Workflow.images_sources
+      |> Workflow.process_downloads(directory)
 
     directory
       |> finish_process
