@@ -9,10 +9,10 @@ defmodule ExMangaDownloadr do
   @time_to_wait_to_fetch_again 1_000
 
   @doc """
-  All HTTPotion.Response bodies should go through this gunzip process
+  All HTTPoison.Response bodies should go through this gunzip process
   """
   def gunzip(body, headers) do
-    if headers[:"Content-Encoding"] == "gzip" do
+    if Enum.member?(headers, {"Content-Encoding", "gzip"}) do
       :zlib.gunzip(body)
     else
       body
@@ -20,55 +20,52 @@ defmodule ExMangaDownloadr do
   end
 
   @doc """
-  All HTTPotion requests should use this set of options
+  All HTTPoison requests should use this set of options
   """
-  def http_headers do
-    [
-      headers: ["User-Agent": @user_agent, "Accept-encoding": "gzip", "Connection": "keep-alive"],
-      timeout: @http_timeout
-    ]
-  end
 
   def retryable_http_get(url, retries \\ @max_retries)
   def retryable_http_get(url, 0), do: raise "Failed to fetch from #{url} after #{@max_retries} retries."
   def retryable_http_get(url, retries) when retries > 0 do
+    require Logger
+    Logger.info("Fetching #{inspect(self())} - #{url}")
+
     try do
       cache_path = "/tmp/ex_manga_downloadr_cache/#{cache_filename(url)}"
       response = if System.get_env("CACHE_HTTP") && File.exists?(cache_path) do
         {:ok, body} = File.read(cache_path)
-        %HTTPotion.Response{ body: body, headers: [ "Content-Encoding": "" ], status_code: 200}
+        %HTTPoison.Response{ body: body, headers: [ "Content-Encoding": "" ], status_code: 200}
       else
-        HTTPotion.get(url, ExMangaDownloadr.http_headers)
+        HTTPoison.get!(url, [{"User-Agent", @user_agent}, {"Accept-encoding", "gzip"}, {"Connection", "keep-alive"}], [timeout: @http_timeout])
       end
       case response do
-        %HTTPotion.Response{ body: _, headers: _, status_code: status } when status > 499 ->
-          raise %HTTPotion.HTTPError{message: "req_timedout"}
-        %HTTPotion.Response{ body: _, headers: headers, status_code: status} when status > 300 and status < 400 ->
+        %HTTPoison.Response{ body: _, headers: _, status_code: status } when status > 499 ->
+          raise %HTTPoison.Error{reason: "req_timedout"}
+        %HTTPoison.Response{ body: _, headers: headers, status_code: status} when status > 300 and status < 400 ->
           retryable_http_get(headers["Location"], retries)
-        %HTTPotion.Response{ body: body, headers: headers, status_code: _ } ->
+        %HTTPoison.Response{ body: body, headers: headers, status_code: _ } ->
           if System.get_env("CACHE_HTTP") && !File.exists?(cache_path) do
             File.write!(cache_path, gunzip(body, headers))
           end
           response
-		%HTTPotion.ErrorResponse{} ->
-	      :timer.sleep(@time_to_wait_to_fetch_again)
-	      retryable_http_get(url, retries - 1)
-      end
+        %HTTPoison.Error{} ->
+            :timer.sleep(@time_to_wait_to_fetch_again)
+            retryable_http_get(url, retries - 1)
+          end
     rescue
-      _ in HTTPotion.ErrorResponse ->
+      _ in HTTPoison.Error ->
 	      :timer.sleep(@time_to_wait_to_fetch_again)
 	      retryable_http_get(url, retries - 1)
     end
   end
 
   defp cache_filename(url) do
-    :crypto.hash(:md5, url) |> Base.encode16
+    url
   end
 
   defmacro fetch(link, do: expression) do
     quote do
       case ExMangaDownloadr.retryable_http_get(unquote(link)) do
-        %HTTPotion.Response{ body: body, headers: headers, status_code: 200 } ->
+        %HTTPoison.Response{ body: body, headers: headers, status_code: 200 } ->
           { :ok, body |> ExMangaDownloadr.gunzip(headers) |> unquote(expression) }
       end
     end
