@@ -78,7 +78,7 @@ defmodule PoolManagement.Worker do
       {:ok, image_src, filename}
     else
       case ExMangaDownloadr.retryable_http_get(image_src) do
-        %HTTPotion.Response{ body: body, headers: _headers, status_code: 200 } ->
+        %HTTPoison.Response{ body: body, headers: _headers, status_code: 200 } ->
           File.write!(filename, body)
           {:ok, image_src, filename}
       end
