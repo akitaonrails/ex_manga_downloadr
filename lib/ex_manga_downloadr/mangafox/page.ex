@@ -25,7 +25,7 @@ defmodule ExMangaDownloadr.Mangafox.Page do
           |> Enum.at(0)
           |> String.rjust(5, ?0)
 
-        chapter_number = Regex.run(~r{[^\d]*(\d+$)}, chapter_number)
+        chapter_number = Regex.run(~r{[^\d]*([\d|\.]+$)}, chapter_number)
           |> Enum.reverse
           |> Enum.at(0)
           |> String.rjust(5, ?0)

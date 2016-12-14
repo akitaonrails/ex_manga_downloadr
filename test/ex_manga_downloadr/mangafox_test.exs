@@ -9,7 +9,7 @@ defmodule ExMangaDownloadr.MangafoxTest do
   @expected_pages ["http://mangafox.me/manga/onepunch_man/vTBD/c066.5/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/2.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/3.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/4.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/5.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/6.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/7.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/8.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/9.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/10.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/11.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/12.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/13.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/14.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/15.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/16.html"]
 
   @expected_image_src "http://h.mfcdn.net/store/manga/11362/TBD-066.5/compressed/f069.005-001.jpg"
-  @expected_image_alt "00005-00001.jpg"
+  @expected_image_alt "066.5-00001.jpg"
 
   test "get all chapters available for the manga" do
     {:ok, {manga_title, chapter_list}} = IndexPage.chapters(@test_manga_url)
