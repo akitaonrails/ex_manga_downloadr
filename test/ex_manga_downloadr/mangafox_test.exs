@@ -2,60 +2,19 @@ defmodule ExMangaDownloadr.MangafoxTest do
   use ExUnit.Case
   use ExMangaDownloadr, :mangafox
 
-  @test_manga_url "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/"
-  @manga_title "NOZO X KIMI - 2-NENSEI HEN Manga"
-  @expected_chapters [
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c002/1.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/1.html"]
+  @test_manga_url "http://mangafox.me/manga/onepunch_man/"
+  @manga_title "ONEPUNCH-MAN Manga"
+  @expected_chapters ["http://mangafox.me/manga/onepunch_man/vTBD/c067/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c065/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c064/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c063/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c062.2/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c062/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c061.4/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c061.3/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c061.2/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c061.1/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c060.2/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c060/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c059.5/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c059.3/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c059.2/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c059/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c058.4/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c058.1/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c057.2/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c057.1/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c056.4/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c056.3/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c056.2/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c056.1/1.html", "http://mangafox.me/manga/onepunch_man/v10/c056.5/1.html", "http://mangafox.me/manga/onepunch_man/v10/c055/1.html", "http://mangafox.me/manga/onepunch_man/v10/c054/1.html", "http://mangafox.me/manga/onepunch_man/v10/c053.3/1.html", "http://mangafox.me/manga/onepunch_man/v10/c053.2/1.html", "http://mangafox.me/manga/onepunch_man/v10/c053.1/1.html", "http://mangafox.me/manga/onepunch_man/v10/c052/1.html", "http://mangafox.me/manga/onepunch_man/v10/c051.5/1.html", "http://mangafox.me/manga/onepunch_man/v10/c051.2/1.html", "http://mangafox.me/manga/onepunch_man/v10/c051.1/1.html", "http://mangafox.me/manga/onepunch_man/v10/c050.2/1.html", "http://mangafox.me/manga/onepunch_man/v10/c050.1/1.html", "http://mangafox.me/manga/onepunch_man/v10/c049.3/1.html", "http://mangafox.me/manga/onepunch_man/v10/c049.2/1.html", "http://mangafox.me/manga/onepunch_man/v10/c049.1/1.html", "http://mangafox.me/manga/onepunch_man/v10/c048.5/1.html", "http://mangafox.me/manga/onepunch_man/v10/c048/1.html", "http://mangafox.me/manga/onepunch_man/v09/c047/1.html", "http://mangafox.me/manga/onepunch_man/v09/c046.5/1.html", "http://mangafox.me/manga/onepunch_man/v09/c046.4/1.html", "http://mangafox.me/manga/onepunch_man/v09/c046.2/1.html", "http://mangafox.me/manga/onepunch_man/v09/c046.1/1.html", "http://mangafox.me/manga/onepunch_man/v09/c045/1.html", "http://mangafox.me/manga/onepunch_man/v09/c044.3/1.html", "http://mangafox.me/manga/onepunch_man/v09/c044.2/1.html", "http://mangafox.me/manga/onepunch_man/v09/c044.1/1.html", "http://mangafox.me/manga/onepunch_man/v09/c043.3/1.html", "http://mangafox.me/manga/onepunch_man/v09/c043.2/1.html", "http://mangafox.me/manga/onepunch_man/v09/c043.1/1.html", "http://mangafox.me/manga/onepunch_man/v09/c042/1.html", "http://mangafox.me/manga/onepunch_man/v09/c041/1.html", "http://mangafox.me/manga/onepunch_man/v09/c040.2/1.html", "http://mangafox.me/manga/onepunch_man/v09/c040.1/1.html", "http://mangafox.me/manga/onepunch_man/v08/c039.7/1.html", "http://mangafox.me/manga/onepunch_man/v08/c039.6/1.html", "http://mangafox.me/manga/onepunch_man/v08/c039.5/1.html", "http://mangafox.me/manga/onepunch_man/v08/c039.2/1.html", "http://mangafox.me/manga/onepunch_man/v08/c039.1/1.html", "http://mangafox.me/manga/onepunch_man/v08/c038/1.html", "http://mangafox.me/manga/onepunch_man/v08/c037.5/1.html", "http://mangafox.me/manga/onepunch_man/v08/c037.4/1.html", "http://mangafox.me/manga/onepunch_man/v08/c037.3/1.html", "http://mangafox.me/manga/onepunch_man/v08/c037.2/1.html", "http://mangafox.me/manga/onepunch_man/v08/c037.1/1.html", "http://mangafox.me/manga/onepunch_man/v07/c036.7/1.html", "http://mangafox.me/manga/onepunch_man/v07/c036.6/1.html", "http://mangafox.me/manga/onepunch_man/v07/c036.5/1.html", "http://mangafox.me/manga/onepunch_man/v07/c036.3/1.html", "http://mangafox.me/manga/onepunch_man/v07/c035.2/1.html", "http://mangafox.me/manga/onepunch_man/v07/c035.1/1.html", "http://mangafox.me/manga/onepunch_man/v07/c034.4/1.html", "http://mangafox.me/manga/onepunch_man/v07/c034.3/1.html", "http://mangafox.me/manga/onepunch_man/v07/c034.2/1.html", "http://mangafox.me/manga/onepunch_man/v07/c034.1/1.html", "http://mangafox.me/manga/onepunch_man/v06/c034.5/1.html", "http://mangafox.me/manga/onepunch_man/v06/c033.1/1.html", "http://mangafox.me/manga/onepunch_man/v06/c032/1.html", "http://mangafox.me/manga/onepunch_man/v06/c031/1.html", "http://mangafox.me/manga/onepunch_man/v06/c030/1.html", "http://mangafox.me/manga/onepunch_man/v06/c029.5/1.html", "http://mangafox.me/manga/onepunch_man/v06/c029/1.html", "http://mangafox.me/manga/onepunch_man/v05/c028.5/1.html", "http://mangafox.me/manga/onepunch_man/v05/c028/1.html", "http://mangafox.me/manga/onepunch_man/v05/c027.2/1.html", "http://mangafox.me/manga/onepunch_man/v05/c027.1/1.html", "http://mangafox.me/manga/onepunch_man/v05/c026/1.html", "http://mangafox.me/manga/onepunch_man/v05/c025.2/1.html", "http://mangafox.me/manga/onepunch_man/v05/c025.1/1.html", "http://mangafox.me/manga/onepunch_man/v04/c024.5/1.html", "http://mangafox.me/manga/onepunch_man/v04/c024.2/1.html", "http://mangafox.me/manga/onepunch_man/v04/c024.1/1.html", "http://mangafox.me/manga/onepunch_man/v04/c023.2/1.html", "http://mangafox.me/manga/onepunch_man/v04/c023.1/1.html", "http://mangafox.me/manga/onepunch_man/v04/c022/1.html", "http://mangafox.me/manga/onepunch_man/v04/c021.4/1.html", "http://mangafox.me/manga/onepunch_man/v04/c021.3/1.html", "http://mangafox.me/manga/onepunch_man/v04/c021.2/1.html", "http://mangafox.me/manga/onepunch_man/v04/c021.1/1.html", "http://mangafox.me/manga/onepunch_man/v03/c020.5/1.html", "http://mangafox.me/manga/onepunch_man/v03/c020.4/1.html", "http://mangafox.me/manga/onepunch_man/v03/c020.2/1.html", "http://mangafox.me/manga/onepunch_man/v03/c020.1/1.html", "http://mangafox.me/manga/onepunch_man/v03/c019/1.html", "http://mangafox.me/manga/onepunch_man/v03/c018/1.html", "http://mangafox.me/manga/onepunch_man/v03/c017.2/1.html", "http://mangafox.me/manga/onepunch_man/v03/c017.1/1.html", "http://mangafox.me/manga/onepunch_man/v03/c016/1.html", "http://mangafox.me/manga/onepunch_man/v02/c015.5/1.html", "http://mangafox.me/manga/onepunch_man/v02/c015/1.html", "http://mangafox.me/manga/onepunch_man/v02/c014/1.html", "http://mangafox.me/manga/onepunch_man/v02/c013/1.html", "http://mangafox.me/manga/onepunch_man/v02/c012/1.html", "http://mangafox.me/manga/onepunch_man/v02/c011/1.html", "http://mangafox.me/manga/onepunch_man/v02/c010/1.html", "http://mangafox.me/manga/onepunch_man/v02/c009/1.html", "http://mangafox.me/manga/onepunch_man/v01/c008.5/1.html", "http://mangafox.me/manga/onepunch_man/v01/c008/1.html", "http://mangafox.me/manga/onepunch_man/v01/c007/1.html", "http://mangafox.me/manga/onepunch_man/v01/c006/1.html", "http://mangafox.me/manga/onepunch_man/v01/c005/1.html", "http://mangafox.me/manga/onepunch_man/v01/c004/1.html", "http://mangafox.me/manga/onepunch_man/v01/c003/1.html", "http://mangafox.me/manga/onepunch_man/v01/c002/1.html", "http://mangafox.me/manga/onepunch_man/v01/c001/1.html"]
 
-  @expected_pages ["http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/1.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/2.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/3.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/4.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/5.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/6.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/7.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/8.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/9.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/10.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/11.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/12.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/13.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/14.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/15.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/16.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/17.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/18.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/19.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/20.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/21.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/22.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/23.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/24.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/25.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/26.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/27.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/28.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/29.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/30.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/31.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/32.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/33.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/34.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/35.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/36.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/37.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/38.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/39.html",
-    "http://mangafox.me/manga/nozo_x_kimi_2_nensei_hen/c001/40.html"]
+  @expected_pages ["http://mangafox.me/manga/onepunch_man/vTBD/c066.5/1.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/2.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/3.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/4.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/5.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/6.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/7.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/8.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/9.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/10.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/11.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/12.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/13.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/14.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/15.html", "http://mangafox.me/manga/onepunch_man/vTBD/c066.5/16.html"]
 
-  @expected_image_src "http://h.mfcdn.net/store/manga/14327/001.0/compressed/pnozomi_kimio_020_000.jpg"
-  @expected_image_alt "nozo_x_kimi_2_nensei_hen-c001-00001.jpg"
+  @expected_image_src "http://h.mfcdn.net/store/manga/11362/TBD-066.5/compressed/f069.005-001.jpg"
+  @expected_image_alt "00005-00001.jpg"
 
   test "get all chapters available for the manga" do
     {:ok, {manga_title, chapter_list}} = IndexPage.chapters(@test_manga_url)
     assert manga_title == @manga_title
-    assert chapter_list == @expected_chapters
+    assert Enum.slice(chapter_list, 0, Enum.count(@expected_chapters)) == @expected_chapters
   end
 
   test "get all the pages of a given chapter" do
@@ -65,7 +24,7 @@ defmodule ExMangaDownloadr.MangafoxTest do
 
   test "get the main image of each page" do
     {:ok, {image_src, image_alt}} = Page.image(@expected_pages |> Enum.at(0))
-    assert image_src == @expected_image_src
+    assert image_src |> String.split("?") |> Enum.at(0) == @expected_image_src
     assert image_alt == @expected_image_alt    
   end
 end

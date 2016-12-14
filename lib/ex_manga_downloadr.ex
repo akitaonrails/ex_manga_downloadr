@@ -22,20 +22,24 @@ defmodule ExMangaDownloadr do
   @doc """
   All HTTPoison requests should use this set of options
   """
+  def http_headers do
+    [{"User-Agent", @user_agent}, {"Accept-encoding", "gzip"}, {"Connection", "keep-alive"}]
+  end
+
+  def http_options do
+    [timeout: @http_timeout]
+  end
 
   def retryable_http_get(url, retries \\ @max_retries)
   def retryable_http_get(url, 0), do: raise "Failed to fetch from #{url} after #{@max_retries} retries."
   def retryable_http_get(url, retries) when retries > 0 do
-    require Logger
-    Logger.info("Fetching #{inspect(self())} - #{url}")
-
     try do
       cache_path = "/tmp/ex_manga_downloadr_cache/#{cache_filename(url)}"
       response = if System.get_env("CACHE_HTTP") && File.exists?(cache_path) do
         {:ok, body} = File.read(cache_path)
         %HTTPoison.Response{ body: body, headers: [ "Content-Encoding": "" ], status_code: 200}
       else
-        HTTPoison.get!(url, [{"User-Agent", @user_agent}, {"Accept-encoding", "gzip"}, {"Connection", "keep-alive"}], [timeout: @http_timeout])
+        HTTPoison.get!(url, http_headers, http_options)
       end
       case response do
         %HTTPoison.Response{ body: _, headers: _, status_code: status } when status > 499 ->
