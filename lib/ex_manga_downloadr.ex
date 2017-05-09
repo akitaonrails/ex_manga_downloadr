@@ -39,13 +39,13 @@ defmodule ExMangaDownloadr do
         {:ok, body} = File.read(cache_path)
         %HTTPoison.Response{ body: body, headers: [ "Content-Encoding": "" ], status_code: 200}
       else
-        HTTPoison.get!(url, http_headers, http_options)
+        HTTPoison.get!(url, http_headers(), http_options())
       end
       case response do
         %HTTPoison.Response{ body: _, headers: _, status_code: status } when status > 499 ->
           raise %HTTPoison.Error{reason: "req_timedout"}
         %HTTPoison.Response{ body: _, headers: headers, status_code: status} when status > 300 and status < 400 ->
-          retryable_http_get(headers["Location"], retries)
+          retryable_http_get(List.keyfind(headers, "Location", 0) |> elem(1), retries)
         %HTTPoison.Response{ body: body, headers: headers, status_code: _ } ->
           if System.get_env("CACHE_HTTP") && !File.exists?(cache_path) do
             File.write!(cache_path, gunzip(body, headers))

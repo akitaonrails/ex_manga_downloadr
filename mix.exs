@@ -3,12 +3,12 @@ defmodule ExMangaDownloadr.Mixfile do
 
   def project do
     [app: :ex_manga_downloadr,
-     version: "1.0.1",
-     elixir: "~> 1.1",
+     version: "1.0.2",
+     elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      escript: [main_module: ExMangaDownloadr.CLI],
-     deps: deps]
+     deps: deps()]
   end
 
   # Configuration for the OTP application
@@ -30,11 +30,11 @@ defmodule ExMangaDownloadr.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:httpoison, "~> 0.10"},
-      {:floki, "~> 0.9.0"},
-      {:porcelain, "~> 2.0.1"},
+      {:httpoison, "~> 0.11"},
+      {:floki, "~> 0.17"},
+      {:porcelain, "~> 2.0.3"},
       {:poolboy, "~> 1.5.1"},
-      {:mock, "~> 0.1.3", only: :test}
+      {:mock, "~> 0.2", only: :test}
     ]
   end
 end
