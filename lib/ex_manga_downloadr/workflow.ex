@@ -1,7 +1,7 @@
 defmodule ExMangaDownloadr.Workflow do
-  alias PoolManagement.Worker
   require Logger
 
+  @max_demand             60 # maximum parallel HTTP GET batch
   @image_dimensions       "600x800" # Kindle maximum resolution
   @pages_per_volume       250       # comfortable PDF file number of pages
   @await_timeout_ms       1_000_000 # has to wait for huge number of async Tasks at once
@@ -21,29 +21,35 @@ defmodule ExMangaDownloadr.Workflow do
   end
 
   def chapters({url, source}) do
-    {:ok, {_manga_title, chapter_list}} = Worker.index_page(url, source)
+    {:ok, {_manga_title, chapter_list}} = MangaWrapper.index_page(url, source)
     {chapter_list, source}
   end
 
   def pages({chapter_list, source}) do
     pages_list = chapter_list
-      |> Enum.map(&Worker.chapter_page([&1, source]))
-      |> Enum.map(&Task.await(&1, @await_timeout_ms))
-      |> Enum.reduce([], fn {:ok, list}, acc -> acc ++ list end)
+      |> Flow.from_enumerable(max_demand: @max_demand)
+      |> Flow.map(&MangaWrapper.chapter_page([&1, source]))
+      |> Flow.partition()
+      |> Flow.reduce(fn -> [] end, fn {:ok, list}, acc -> acc ++ list end)
+      |> Enum.to_list()
     {pages_list, source}
   end
 
   def images_sources({pages_list, source}) do
     pages_list
-      |> Enum.map(&Worker.page_image([&1, source]))
-      |> Enum.map(&Task.await(&1, @await_timeout_ms))
+      |> Flow.from_enumerable(max_demand: @max_demand)
+      |> Flow.map(&MangaWrapper.page_image([&1, source]))
+      |> Flow.partition()
+      |> Enum.to_list()
       |> Enum.map(fn {:ok, image} -> image end)
   end
 
   def process_downloads(images_list, directory) do
     images_list
-      |> Enum.map(&Worker.page_download_image(&1, directory))
-      |> Enum.map(&Task.await(&1, @await_timeout_ms))
+      |> Flow.from_enumerable(max_demand: @max_demand)
+      |> Flow.map(&MangaWrapper.page_download_image(&1, directory))
+      |> Flow.partition()
+      |> Enum.to_list()
     directory
   end
 

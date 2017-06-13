@@ -15,8 +15,7 @@ defmodule ExMangaDownloadr.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :httpoison, :porcelain, :observer],
-     mod: {PoolManagement, []}]
+    [applications: [:logger, :httpoison, :porcelain, :observer]]
   end
 
   # Dependencies can be Hex packages:
@@ -33,7 +32,7 @@ defmodule ExMangaDownloadr.Mixfile do
       {:httpoison, "~> 0.11"},
       {:floki, "~> 0.17"},
       {:porcelain, "~> 2.0.3"},
-      {:poolboy, "~> 1.5.1"},
+      {:flow, "~> 0.11"},
       {:mock, "~> 0.2", only: :test}
     ]
   end
