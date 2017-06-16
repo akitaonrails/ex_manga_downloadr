@@ -4,12 +4,10 @@ defmodule ExMangaDownloadr.MangaSource do
   @callback chapter_page(page_link :: String.t) :: {:ok, any}
   @callback page_image(page_link :: String.t) :: {:ok, any}
 
-  defstruct [:url, :module]
-
   def for(url) do
     case module_for(url) do
       :invalid -> :error
-      module -> {:ok, %__MODULE__{url: url, module: module}}
+      module -> {:ok, module}
     end
   end
 

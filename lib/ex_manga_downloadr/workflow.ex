@@ -13,12 +13,12 @@ defmodule ExMangaDownloadr.Workflow do
 
   def determine_source(url) do
     case ExMangaDownloadr.MangaSource.for(url) do
-      {:ok, source} -> source
+      {:ok, module} -> {url, module}
       :error -> raise __MODULE__, message: "Unable to determine the manga source, URL invalid."
     end
   end
 
-  def chapters(%MangaSource{url: url, module: module}) do
+  def chapters({url, module}) do
     {:ok, {_manga_title, chapter_list}} = module.index_page(url)
 
     {chapter_list, module}

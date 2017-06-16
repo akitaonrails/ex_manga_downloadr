@@ -17,8 +17,7 @@ defmodule ExMangaDownloadrTest do
     with_mock ExMangaDownloadr.MangaSource.MangaReader,
       [index_page: fn(_url) -> {:ok, {@expected_manga_title, @expected_chapters}} end] do
 
-      source = %ExMangaDownloadr.MangaSource{url: "foo", module: @module}
-      chapters_list = source |> Workflow.chapters()
+      chapters_list = {"http://foo.com/bar", @module} |> Workflow.chapters()
 
       assert chapters_list == {@expected_chapters, @module}
     end
