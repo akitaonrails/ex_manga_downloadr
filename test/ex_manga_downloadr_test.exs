@@ -11,9 +11,8 @@ defmodule ExMangaDownloadrTest do
   @expected_manga_title "Boku wa Ookami Manga"
   @expected_chapters ["/boku-wa-ookami/1", "/boku-wa-ookami/2", "/boku-wa-ookami/3"]
   @expected_pages ["/boku-wa-ookami/1", "/boku-wa-ookami/1/2", "/boku-wa-ookami/1/3"]
-  @expected_image {:ok,
-    {"http://i3.mangareader.net/boku-wa-ookami/1/boku-wa-ookami-2523599.jpg",
-      "Ookami wa Boku 00001 - Page 00001.jpg"}}
+  @expected_image {"http://i3.mangareader.net/boku-wa-ookami/1/boku-wa-ookami-2523599.jpg",
+      "Ookami wa Boku 00001 - Page 00001.jpg"}
 
   test "workflow fetches chapters" do
     with_mock ExMangaDownloadr.MangaReader.IndexPage,
@@ -31,9 +30,8 @@ defmodule ExMangaDownloadrTest do
 
   test "workflow fetches image sources from pages" do
     with_mock ExMangaDownloadr.MangaReader.Page,
-      [image: fn(_page_link) -> @expected_image end] do
-      {:ok, image} = @expected_image
-      assert Workflow.images_sources({["foo"], @source}) == [image]
+      [image: fn(_page_link) -> {:ok, @expected_image} end] do
+      assert Workflow.images_sources({["foo"], @source}) == [@expected_image]
     end
   end
 

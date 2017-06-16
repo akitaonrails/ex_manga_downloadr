@@ -8,13 +8,13 @@ defmodule MangaWrapper do
       |> apply(:chapters, [url])
   end
 
-  def chapter_page([chapter_link, source]) do
+  def chapter_page(chapter_link, source) do
     source
       |> manga_source("ChapterPage")
       |> apply(:pages, [chapter_link])
   end
 
-  def page_image([page_link, source]) do
+  def page_image(page_link, source) do
     source
       |> manga_source("Page")
       |> apply(:image, [page_link])
