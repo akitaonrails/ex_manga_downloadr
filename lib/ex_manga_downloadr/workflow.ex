@@ -1,8 +1,9 @@
 defmodule ExMangaDownloadr.Workflow do
   require Logger
-  alias ExMangaDownloadr.MangaSource
 
   defexception message: nil
+
+  @manga_source Application.get_env(:ex_manga_downloadr, :manga_source)
 
   @max_demand             100 # maximum parallel HTTP GET batch
   @download_timeout       30000 # 30 seconds for download timeout
@@ -12,7 +13,7 @@ defmodule ExMangaDownloadr.Workflow do
   @maximum_pdf_generation 2 # the best value is probably the total number of CPU cores
 
   def determine_source(url) do
-    case ExMangaDownloadr.MangaSource.for(url) do
+    case @manga_source.find(url) do
       {:ok, module} -> {url, module}
       :error -> raise __MODULE__, message: "Unable to determine the manga source, URL invalid."
     end
