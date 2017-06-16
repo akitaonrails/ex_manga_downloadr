@@ -1,10 +1,19 @@
 defmodule ExMangaDownloadr.Mangafox do
   @behaviour ExMangaDownloadr.MangaSource
 
-  alias ExMangaDownloadr.Mangafox
+  import ExMangaDownloadr.Mangafox.{IndexPage, ChapterPage, Page}
 
   def applies?(url), do: ~r/mangafox\.me/ |> Regex.match?(url)
-  def index_page(url), do: Mangafox.IndexPage.chapters(url)
-  def chapter_page(url), do: Mangafox.ChapterPage.pages(url)
-  def page_image(url), do: Mangafox.Page.image(url)
+
+  def index_page(url) do
+    ExMangaDownloadr.fetch url, &{fetch_manga_title(&1), fetch_chapters(&1)}
+  end
+
+  def chapter_page(url) do
+    ExMangaDownloadr.fetch url, &fetch_pages(&1, url)
+  end
+
+  def page_image(url) do
+    ExMangaDownloadr.fetch url, &fetch_image(&1, url)
+  end
 end

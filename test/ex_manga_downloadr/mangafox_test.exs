@@ -1,6 +1,6 @@
 defmodule ExMangaDownloadr.MangafoxTest do
   use ExUnit.Case
-  use ExMangaDownloadr, :mangafox
+  alias ExMangaDownloadr.Mangafox
 
   @test_manga_url "http://mangafox.me/manga/death_note/"
   @manga_title "DEATH NOTE Manga"
@@ -12,18 +12,21 @@ defmodule ExMangaDownloadr.MangafoxTest do
   @expected_image_alt "00110-00001.jpg"
 
   test "get all chapters available for the manga" do
-    {:ok, {manga_title, chapter_list}} = IndexPage.chapters(@test_manga_url)
+    {:ok, {manga_title, chapter_list}} = Mangafox.index_page(@test_manga_url)
+
     assert manga_title == @manga_title
     assert Enum.slice(chapter_list, 0, Enum.count(@expected_chapters)) == @expected_chapters
   end
 
   test "get all the pages of a given chapter" do
-    {:ok, pages_list} = ChapterPage.pages(@expected_chapters |> Enum.at(1))
+    {:ok, pages_list} = Mangafox.chapter_page(@expected_chapters |> Enum.at(1))
+
     assert pages_list == @expected_pages
   end
 
   test "get the main image of each page" do
-    {:ok, {image_src, image_alt}} = Page.image(@expected_pages |> Enum.at(0))
+    {:ok, {image_src, image_alt}} = Mangafox.page_image(@expected_pages |> Enum.at(0))
+
     assert image_src |> String.split("?") |> Enum.at(0) == @expected_image_src
     assert image_alt == @expected_image_alt    
   end

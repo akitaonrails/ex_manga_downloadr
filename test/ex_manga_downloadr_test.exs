@@ -14,8 +14,8 @@ defmodule ExMangaDownloadrTest do
       "Ookami wa Boku 00001 - Page 00001.jpg"}
 
   test "workflow fetches chapters" do
-    with_mock ExMangaDownloadr.MangaReader.IndexPage,
-      [chapters: fn(_url) -> {:ok, {@expected_manga_title, @expected_chapters}} end] do
+    with_mock ExMangaDownloadr.MangaReader,
+      [index_page: fn(_url) -> {:ok, {@expected_manga_title, @expected_chapters}} end] do
 
       source = %ExMangaDownloadr.MangaSource{url: "foo", module: @module}
       chapters_list = source |> Workflow.chapters()
@@ -25,8 +25,8 @@ defmodule ExMangaDownloadrTest do
   end
 
   test "workflow fetches pages from chapters" do
-    with_mock ExMangaDownloadr.MangaReader.ChapterPage,
-      [pages: fn(_chapter_link) -> {:ok, @expected_pages} end] do
+    with_mock ExMangaDownloadr.MangaReader,
+      [chapter_page: fn(_chapter_link) -> {:ok, @expected_pages} end] do
 
       pages_list = {["foo"], @module} |> Workflow.pages()
 
@@ -35,8 +35,8 @@ defmodule ExMangaDownloadrTest do
   end
 
   test "workflow fetches image sources from pages" do
-    with_mock ExMangaDownloadr.MangaReader.Page,
-      [image: fn(_page_link) -> {:ok, @expected_image} end] do
+    with_mock ExMangaDownloadr.MangaReader,
+      [page_image: fn(_page_link) -> {:ok, @expected_image} end] do
       assert Workflow.images_sources({["foo"], @module}) == [@expected_image]
     end
   end
