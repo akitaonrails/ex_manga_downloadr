@@ -1,33 +1,55 @@
 defmodule ExMangaDownloadr.MangaSource.MangafoxTest do
   use ExUnit.Case
   alias ExMangaDownloadr.MangaSource.Mangafox
+  import TestHelper, only: [extract_value: 1]
 
-  @test_manga_url "http://mangafox.me/manga/death_note/"
+  @url "http://mangafox.me/manga/death_note/index.html"
   @manga_title "DEATH NOTE Manga"
-  @expected_chapters ["http://mangafox.me/manga/death_note/vTBD/c110.5/1.html", "http://mangafox.me/manga/death_note/vTBD/c110/1.html", "http://mangafox.me/manga/death_note/vTBD/c109/1.html", "http://mangafox.me/manga/death_note/v12/c108/1.html", "http://mangafox.me/manga/death_note/v12/c107/1.html", "http://mangafox.me/manga/death_note/v12/c106/1.html", "http://mangafox.me/manga/death_note/v12/c105/1.html", "http://mangafox.me/manga/death_note/v12/c104/1.html", "http://mangafox.me/manga/death_note/v12/c103/1.html", "http://mangafox.me/manga/death_note/v12/c101/1.html", "http://mangafox.me/manga/death_note/v12/c100/1.html", "http://mangafox.me/manga/death_note/v12/c099/1.html", "http://mangafox.me/manga/death_note/v11/c098/1.html", "http://mangafox.me/manga/death_note/v11/c097/1.html", "http://mangafox.me/manga/death_note/v11/c096/1.html", "http://mangafox.me/manga/death_note/v11/c095/1.html", "http://mangafox.me/manga/death_note/v11/c094/1.html", "http://mangafox.me/manga/death_note/v11/c093/1.html", "http://mangafox.me/manga/death_note/v11/c092/1.html", "http://mangafox.me/manga/death_note/v11/c091/1.html", "http://mangafox.me/manga/death_note/v11/c090/1.html", "http://mangafox.me/manga/death_note/v11/c089/1.html", "http://mangafox.me/manga/death_note/v10/c088/1.html", "http://mangafox.me/manga/death_note/v10/c087/1.html", "http://mangafox.me/manga/death_note/v10/c086/1.html", "http://mangafox.me/manga/death_note/v10/c085/1.html", "http://mangafox.me/manga/death_note/v10/c084/1.html", "http://mangafox.me/manga/death_note/v10/c083/1.html", "http://mangafox.me/manga/death_note/v10/c082/1.html", "http://mangafox.me/manga/death_note/v10/c081/1.html", "http://mangafox.me/manga/death_note/v10/c080/1.html", "http://mangafox.me/manga/death_note/v09/c079/1.html", "http://mangafox.me/manga/death_note/v09/c078/1.html", "http://mangafox.me/manga/death_note/v09/c077/1.html", "http://mangafox.me/manga/death_note/v09/c076/1.html", "http://mangafox.me/manga/death_note/v09/c075/1.html", "http://mangafox.me/manga/death_note/v09/c074/1.html", "http://mangafox.me/manga/death_note/v09/c073/1.html", "http://mangafox.me/manga/death_note/v09/c072/1.html", "http://mangafox.me/manga/death_note/v09/c071/1.html", "http://mangafox.me/manga/death_note/v08/c070/1.html", "http://mangafox.me/manga/death_note/v08/c069/1.html", "http://mangafox.me/manga/death_note/v08/c068/1.html", "http://mangafox.me/manga/death_note/v08/c067/1.html", "http://mangafox.me/manga/death_note/v08/c066/1.html", "http://mangafox.me/manga/death_note/v08/c065/1.html", "http://mangafox.me/manga/death_note/v08/c064/1.html", "http://mangafox.me/manga/death_note/v08/c063/1.html", "http://mangafox.me/manga/death_note/v08/c062/1.html", "http://mangafox.me/manga/death_note/v07/c061/1.html", "http://mangafox.me/manga/death_note/v07/c060/1.html", "http://mangafox.me/manga/death_note/v07/c059/1.html", "http://mangafox.me/manga/death_note/v07/c058/1.html", "http://mangafox.me/manga/death_note/v07/c057/1.html", "http://mangafox.me/manga/death_note/v07/c056/1.html", "http://mangafox.me/manga/death_note/v07/c055/1.html", "http://mangafox.me/manga/death_note/v07/c054/1.html", "http://mangafox.me/manga/death_note/v07/c053/1.html", "http://mangafox.me/manga/death_note/v06/c052/1.html", "http://mangafox.me/manga/death_note/v06/c051/1.html", "http://mangafox.me/manga/death_note/v06/c050/1.html", "http://mangafox.me/manga/death_note/v06/c049/1.html", "http://mangafox.me/manga/death_note/v06/c048/1.html", "http://mangafox.me/manga/death_note/v06/c047/1.html", "http://mangafox.me/manga/death_note/v06/c046/1.html", "http://mangafox.me/manga/death_note/v06/c045/1.html", "http://mangafox.me/manga/death_note/v06/c044/1.html", "http://mangafox.me/manga/death_note/v05/c043/1.html", "http://mangafox.me/manga/death_note/v05/c042/1.html", "http://mangafox.me/manga/death_note/v05/c041/1.html", "http://mangafox.me/manga/death_note/v05/c040/1.html", "http://mangafox.me/manga/death_note/v05/c039/1.html", "http://mangafox.me/manga/death_note/v05/c038/1.html", "http://mangafox.me/manga/death_note/v05/c037/1.html", "http://mangafox.me/manga/death_note/v05/c036/1.html", "http://mangafox.me/manga/death_note/v05/c035/1.html", "http://mangafox.me/manga/death_note/v04/c034/1.html", "http://mangafox.me/manga/death_note/v04/c033/1.html", "http://mangafox.me/manga/death_note/v04/c032/1.html", "http://mangafox.me/manga/death_note/v04/c031/1.html", "http://mangafox.me/manga/death_note/v04/c030/1.html", "http://mangafox.me/manga/death_note/v04/c029/1.html", "http://mangafox.me/manga/death_note/v04/c028/1.html", "http://mangafox.me/manga/death_note/v04/c027/1.html", "http://mangafox.me/manga/death_note/v04/c026/1.html", "http://mangafox.me/manga/death_note/v03/c025/1.html", "http://mangafox.me/manga/death_note/v03/c024/1.html", "http://mangafox.me/manga/death_note/v03/c023/1.html", "http://mangafox.me/manga/death_note/v03/c022/1.html", "http://mangafox.me/manga/death_note/v03/c021/1.html", "http://mangafox.me/manga/death_note/v03/c020/1.html", "http://mangafox.me/manga/death_note/v03/c019/1.html", "http://mangafox.me/manga/death_note/v03/c018/1.html", "http://mangafox.me/manga/death_note/v03/c017/1.html", "http://mangafox.me/manga/death_note/v02/c016/1.html", "http://mangafox.me/manga/death_note/v02/c015/1.html", "http://mangafox.me/manga/death_note/v02/c014/1.html", "http://mangafox.me/manga/death_note/v02/c013/1.html", "http://mangafox.me/manga/death_note/v02/c012/1.html", "http://mangafox.me/manga/death_note/v02/c011/1.html", "http://mangafox.me/manga/death_note/v02/c010/1.html", "http://mangafox.me/manga/death_note/v02/c009/1.html", "http://mangafox.me/manga/death_note/v02/c008/1.html", "http://mangafox.me/manga/death_note/v01/c007/1.html", "http://mangafox.me/manga/death_note/v01/c006/1.html", "http://mangafox.me/manga/death_note/v01/c005/1.html", "http://mangafox.me/manga/death_note/v01/c004/1.html", "http://mangafox.me/manga/death_note/v01/c003/1.html", "http://mangafox.me/manga/death_note/v01/c002/1.html", "http://mangafox.me/manga/death_note/v01/c001.1/1.html", "http://mangafox.me/manga/death_note/v01/c001/1.html", "http://mangafox.me/manga/death_note/v00/c000/1.html"]
-
-  @expected_pages ["http://mangafox.me/manga/death_note/vTBD/c110/1.html", "http://mangafox.me/manga/death_note/vTBD/c110/2.html", "http://mangafox.me/manga/death_note/vTBD/c110/3.html", "http://mangafox.me/manga/death_note/vTBD/c110/4.html", "http://mangafox.me/manga/death_note/vTBD/c110/5.html", "http://mangafox.me/manga/death_note/vTBD/c110/6.html", "http://mangafox.me/manga/death_note/vTBD/c110/7.html", "http://mangafox.me/manga/death_note/vTBD/c110/8.html", "http://mangafox.me/manga/death_note/vTBD/c110/9.html", "http://mangafox.me/manga/death_note/vTBD/c110/10.html", "http://mangafox.me/manga/death_note/vTBD/c110/11.html", "http://mangafox.me/manga/death_note/vTBD/c110/12.html", "http://mangafox.me/manga/death_note/vTBD/c110/13.html", "http://mangafox.me/manga/death_note/vTBD/c110/14.html", "http://mangafox.me/manga/death_note/vTBD/c110/15.html", "http://mangafox.me/manga/death_note/vTBD/c110/16.html", "http://mangafox.me/manga/death_note/vTBD/c110/17.html", "http://mangafox.me/manga/death_note/vTBD/c110/18.html", "http://mangafox.me/manga/death_note/vTBD/c110/19.html", "http://mangafox.me/manga/death_note/vTBD/c110/20.html", "http://mangafox.me/manga/death_note/vTBD/c110/21.html", "http://mangafox.me/manga/death_note/vTBD/c110/22.html", "http://mangafox.me/manga/death_note/vTBD/c110/23.html", "http://mangafox.me/manga/death_note/vTBD/c110/24.html", "http://mangafox.me/manga/death_note/vTBD/c110/25.html", "http://mangafox.me/manga/death_note/vTBD/c110/26.html", "http://mangafox.me/manga/death_note/vTBD/c110/27.html", "http://mangafox.me/manga/death_note/vTBD/c110/28.html", "http://mangafox.me/manga/death_note/vTBD/c110/29.html", "http://mangafox.me/manga/death_note/vTBD/c110/30.html", "http://mangafox.me/manga/death_note/vTBD/c110/31.html", "http://mangafox.me/manga/death_note/vTBD/c110/32.html", "http://mangafox.me/manga/death_note/vTBD/c110/33.html", "http://mangafox.me/manga/death_note/vTBD/c110/34.html", "http://mangafox.me/manga/death_note/vTBD/c110/35.html", "http://mangafox.me/manga/death_note/vTBD/c110/36.html", "http://mangafox.me/manga/death_note/vTBD/c110/37.html", "http://mangafox.me/manga/death_note/vTBD/c110/38.html", "http://mangafox.me/manga/death_note/vTBD/c110/39.html", "http://mangafox.me/manga/death_note/vTBD/c110/40.html", "http://mangafox.me/manga/death_note/vTBD/c110/41.html", "http://mangafox.me/manga/death_note/vTBD/c110/42.html", "http://mangafox.me/manga/death_note/vTBD/c110/43.html", "http://mangafox.me/manga/death_note/vTBD/c110/44.html", "http://mangafox.me/manga/death_note/vTBD/c110/45.html", "http://mangafox.me/manga/death_note/vTBD/c110/46.html", "http://mangafox.me/manga/death_note/vTBD/c110/47.html", "http://mangafox.me/manga/death_note/vTBD/c110/48.html", "http://mangafox.me/manga/death_note/vTBD/c110/49.html", "http://mangafox.me/manga/death_note/vTBD/c110/50.html", "http://mangafox.me/manga/death_note/vTBD/c110/51.html", "http://mangafox.me/manga/death_note/vTBD/c110/52.html", "http://mangafox.me/manga/death_note/vTBD/c110/53.html", "http://mangafox.me/manga/death_note/vTBD/c110/54.html", "http://mangafox.me/manga/death_note/vTBD/c110/55.html", "http://mangafox.me/manga/death_note/vTBD/c110/56.html", "http://mangafox.me/manga/death_note/vTBD/c110/57.html"]
-
-  @expected_image_src "http://h.mfcdn.net/store/manga/25/TBD-110.0/compressed/00.jpg"
-  @expected_image_alt "00110-00001.jpg"
+  @expected_chapters [
+    "http://mangafox.me/manga/death_note/vTBD/c110.5/1.html",
+    "http://mangafox.me/manga/death_note/vTBD/c110/1.html",
+    "http://mangafox.me/manga/death_note/v12/c108/1.html",
+    "http://mangafox.me/manga/death_note/v12/c107/1.html"
+  ]
+  @expected_pages [
+    ["http://mangafox.me/manga/death_note/vTBD/c110.5/1.html"],
+    ["http://mangafox.me/manga/death_note/vTBD/c110/1.html"],
+    ["http://mangafox.me/manga/death_note/v12/c108/1.html"],
+    [
+      "http://mangafox.me/manga/death_note/v12/c107/1.html",
+      "http://mangafox.me/manga/death_note/v12/c107/2.html"
+    ]
+  ]
+  @expected_images_list [
+    [{"http://h.mfcdn.net/TBD-110.5/01.jpg?token=token", "110.5-00001.jpg"}],
+    [{"http://h.mfcdn.net/TBD-110.000.jpg?token=token", "00110-00001.jpg"}],
+    [{"http://h.mfcdn.net/12-108.0/DN_01.jpg?token=token", "00108-00001.jpg"}],
+    [
+      {"http://h.mfcdn.net/12-107.0/DN_01.jpg?token=token", "00107-00001.jpg"},
+      {"http://h.mfcdn.net/12-107.0/DN_02.jpg?token=token", "00107-00002.jpg"}
+    ]
+  ]
 
   test "get all chapters available for the manga" do
-    {:ok, {manga_title, chapter_list}} = Mangafox.index_page(@test_manga_url)
+    {manga_title, chapter_list} = Mangafox.index_page(@url) |> extract_value
 
     assert manga_title == @manga_title
-    assert Enum.slice(chapter_list, 0, Enum.count(@expected_chapters)) == @expected_chapters
+    assert chapter_list == @expected_chapters
   end
 
   test "get all the pages of a given chapter" do
-    {:ok, pages_list} = Mangafox.chapter_page(@expected_chapters |> Enum.at(1))
+    pages_list = Enum.map @expected_chapters, fn chapter_url ->
+      Mangafox.chapter_page(chapter_url) |> extract_value
+    end
 
     assert pages_list == @expected_pages
   end
 
   test "get the main image of each page" do
-    {:ok, {image_src, image_alt}} = Mangafox.page_image(@expected_pages |> Enum.at(0))
+    images_list = Enum.map @expected_pages, fn list ->
+      Enum.map list, &Mangafox.page_image(&1) |> extract_value
+    end
 
-    assert image_src |> String.split("?") |> Enum.at(0) == @expected_image_src
-    assert image_alt == @expected_image_alt    
+    assert images_list == @expected_images_list
   end
 end

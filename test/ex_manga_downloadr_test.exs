@@ -26,15 +26,10 @@ defmodule ExMangaDownloadrTest do
   end
 
   test "workflow tries to download the images" do
-    with_mock HTTPoison,
-      [get!: fn(_url, _headers, _options) -> %HTTPoison.Response{ body: "", headers: [], status_code: 200 } end] do
-      with_mock File, [write!: fn(_filename, _body) -> nil end,
-                       exists?: fn(_filename) -> false end] do
-        assert Workflow.process_downloads([{"http://src_foo", "filename_foo"}], "/tmp") == "/tmp"
+    with_mock File, [write!: fn(_filename, _body) -> nil end, exists?: fn(_filename) -> false end] do
+      assert Workflow.process_downloads([{"http://src_foo", "filename_foo"}], "/tmp") == "/tmp"
 
-        assert called HTTPoison.get!("http://src_foo", ExMangaDownloadr.Downloader.http_headers, ExMangaDownloadr.Downloader.http_options)
-        assert called File.write!("/tmp/filename_foo", "")
-      end
+      assert called File.write!("/tmp/filename_foo", "fake_response")
     end
   end
 
