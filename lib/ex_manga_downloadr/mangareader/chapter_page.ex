@@ -3,7 +3,7 @@ defmodule ExMangaDownloadr.MangaReader.ChapterPage do
   require ExMangaDownloadr
 
   def pages(chapter_link) do
-    ExMangaDownloadr.fetch "http://www.mangareader.net#{chapter_link}", do: fetch_pages
+    ExMangaDownloadr.fetch "http://www.mangareader.net#{chapter_link}", &fetch_pages/1
   end
 
   defp fetch_pages(html) do

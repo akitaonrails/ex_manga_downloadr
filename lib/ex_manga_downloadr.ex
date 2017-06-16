@@ -66,12 +66,10 @@ defmodule ExMangaDownloadr do
     url
   end
 
-  defmacro fetch(link, do: expression) do
-    quote do
-      case ExMangaDownloadr.retryable_http_get(unquote(link)) do
-        %HTTPoison.Response{ body: body, headers: headers, status_code: 200 } ->
-          { :ok, body |> ExMangaDownloadr.gunzip(headers) |> unquote(expression) }
-      end
+  def fetch(link, callback) do
+    case ExMangaDownloadr.retryable_http_get(link) do
+      %HTTPoison.Response{ body: body, headers: headers, status_code: 200 } ->
+        { :ok, body |> ExMangaDownloadr.gunzip(headers) |> callback.() }
     end
   end
 

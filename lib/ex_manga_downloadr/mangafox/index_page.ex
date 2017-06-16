@@ -3,11 +3,9 @@ defmodule ExMangaDownloadr.Mangafox.IndexPage do
   require ExMangaDownloadr
 
   def chapters(manga_root_url) do
-    ExMangaDownloadr.fetch manga_root_url, do: collect
-  end
-
-  defp collect(html) do
-    {fetch_manga_title(html), fetch_chapters(html)}
+    ExMangaDownloadr.fetch manga_root_url, fn html ->
+      {fetch_manga_title(html), fetch_chapters(html)}
+    end
   end
 
   defp fetch_manga_title(html) do

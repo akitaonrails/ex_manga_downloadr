@@ -3,7 +3,7 @@ defmodule ExMangaDownloadr.Mangafox.ChapterPage do
   require ExMangaDownloadr
 
   def pages(chapter_link) do
-    ExMangaDownloadr.fetch chapter_link, do: fetch_pages(chapter_link)
+    ExMangaDownloadr.fetch chapter_link, &fetch_pages(&1, chapter_link)
   end
 
   defp fetch_pages(html, chapter_link) do

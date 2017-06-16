@@ -3,7 +3,7 @@ defmodule ExMangaDownloadr.MangaReader.Page do
   require ExMangaDownloadr
 
   def image(page_link) do
-    ExMangaDownloadr.fetch "http://www.mangareader.net#{page_link}", do: fetch_image
+    ExMangaDownloadr.fetch "http://www.mangareader.net#{page_link}", &fetch_image/1
   end
 
   defp fetch_image(html) do
