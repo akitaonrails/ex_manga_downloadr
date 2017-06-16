@@ -11,7 +11,7 @@ defmodule ImageDownloader do
       Logger.debug("Skipping image #{filename}; already downloaded.")
       {:ok, image_src, filename}
     else
-      case ExMangaDownloadr.retryable_http_get(image_src) do
+      case ExMangaDownloadr.Downloader.call(image_src) do
         %HTTPoison.Response{ body: body, headers: _headers, status_code: 200 } ->
           File.write!(filename, body)
           {:ok, image_src, filename}

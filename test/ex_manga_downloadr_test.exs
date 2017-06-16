@@ -32,7 +32,7 @@ defmodule ExMangaDownloadrTest do
                        exists?: fn(_filename) -> false end] do
         assert Workflow.process_downloads([{"http://src_foo", "filename_foo"}], "/tmp") == "/tmp"
 
-        assert called HTTPoison.get!("http://src_foo", ExMangaDownloadr.http_headers, ExMangaDownloadr.http_options)
+        assert called HTTPoison.get!("http://src_foo", ExMangaDownloadr.Downloader.http_headers, ExMangaDownloadr.Downloader.http_options)
         assert called File.write!("/tmp/filename_foo", nil)
       end
     end
