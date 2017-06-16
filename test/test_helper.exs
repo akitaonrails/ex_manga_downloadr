@@ -1,3 +1,5 @@
+Application.ensure_all_started :briefly
+
 ExUnit.start()
 
 defmodule TestHelper do

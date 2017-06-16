@@ -1,9 +1,8 @@
 defmodule ExMangaDownloadrTest do
   use ExUnit.Case, async: false
-  doctest ExMangaDownloadr
   alias ExMangaDownloadr.Workflow
 
-  import Mock
+  doctest ExMangaDownloadr
 
   @module ExMangaDownloadr.MangaSource.FakeMangaSource.Fake
 
@@ -26,30 +25,35 @@ defmodule ExMangaDownloadrTest do
   end
 
   test "workflow tries to download the images" do
-    with_mock File, [write!: fn(_filename, _body) -> nil end, exists?: fn(_filename) -> false end] do
-      assert Workflow.process_downloads([{"http://src_foo", "filename_foo"}], "/tmp") == "/tmp"
+    {:ok, tmpdir} = Briefly.create(directory: true)
 
-      assert called File.write!("/tmp/filename_foo", "fake_response")
-    end
+    assert Workflow.process_downloads([{"http://src_foo", "filename_foo"}], tmpdir) == tmpdir
+    assert File.read("#{tmpdir}/filename_foo") == {:ok, "fake_response"}
   end
 
   test "workflow skips existing images" do
-    with_mock File, [exists?: fn(_filename) -> true end] do
-      assert Workflow.process_downloads([{"http://src_foo", "filename_foo"}], "/tmp") == "/tmp"
-    end
+    {:ok, tmpdir} = Briefly.create(directory: true)
+
+    File.touch! "#{tmpdir}/filename_foo"
+
+    assert Workflow.process_downloads([{"http://src_foo", "filename_foo"}], tmpdir) == tmpdir
+    assert File.read("#{tmpdir}/filename_foo") == {:ok, ""}
   end
 
   test "workflow tries to generate the PDFs" do
-    with_mock File, [ls:      fn(_dir)       -> {:ok, ["1.jpg", "2.jpg"]} end,
-                     mkdir_p: fn(_dir)       -> nil end,
-                     rename:  fn(_from, _to) -> nil end] do
-      with_mock Porcelain, [shell: fn(_cmd) -> nil end] do
-        Workflow.compile_pdfs("/tmp/manga_foo", "manga_foo")
+    import Mock
 
-        assert called File.rename("/tmp/manga_foo/1.jpg", "/tmp/manga_foo/manga_foo_1/1.jpg")
-        assert called File.rename("/tmp/manga_foo/2.jpg", "/tmp/manga_foo/manga_foo_1/2.jpg")
-        assert called Porcelain.shell("convert /tmp/manga_foo/manga_foo_1/*.jpg /tmp/manga_foo/manga_foo_1.pdf")
-      end
+    {:ok, tmpdir} = Briefly.create(directory: true)
+    Enum.each [1, 2], &File.write("#{tmpdir}/#{&1}.jpg", "file#{&1}")
+
+    with_mock Porcelain, [shell: fn(_cmd) -> nil end] do
+      Workflow.compile_pdfs(tmpdir, "manga_foo")
+
+      refute File.exists?("#{tmpdir}/1.jpg")
+      refute File.exists?("#{tmpdir}/2.jpg")
+      assert File.read("#{tmpdir}/manga_foo_1/1.jpg") == {:ok, "file1"}
+      assert File.read("#{tmpdir}/manga_foo_1/2.jpg") == {:ok, "file2"}
+      assert called Porcelain.shell("convert #{tmpdir}/manga_foo_1/*.jpg #{tmpdir}/manga_foo_1.pdf")
     end
   end
 end
