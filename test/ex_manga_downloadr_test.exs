@@ -1,12 +1,11 @@
 defmodule ExMangaDownloadrTest do
   use ExUnit.Case, async: false
-  alias ExMangaDownloadr.Workflow
   doctest ExMangaDownloadr
+  alias ExMangaDownloadr.Workflow
 
   import Mock
 
-  @source "mangareader"
-  @user_agent Application.get_env(:ex_manga_downloadr, :user_agent)
+  @module ExMangaDownloadr.MangaReader
 
   @expected_manga_title "Boku wa Ookami Manga"
   @expected_chapters ["/boku-wa-ookami/1", "/boku-wa-ookami/2", "/boku-wa-ookami/3"]
@@ -17,21 +16,28 @@ defmodule ExMangaDownloadrTest do
   test "workflow fetches chapters" do
     with_mock ExMangaDownloadr.MangaReader.IndexPage,
       [chapters: fn(_url) -> {:ok, {@expected_manga_title, @expected_chapters}} end] do
-      assert Workflow.chapters({"foo", @source}) == {@expected_chapters, @source}
+
+      source = %ExMangaDownloadr.MangaSource{url: "foo", module: @module}
+      chapters_list = source |> Workflow.chapters()
+
+      assert chapters_list == {@expected_chapters, @module}
     end
   end
 
   test "workflow fetches pages from chapters" do
     with_mock ExMangaDownloadr.MangaReader.ChapterPage,
       [pages: fn(_chapter_link) -> {:ok, @expected_pages} end] do
-      assert Workflow.pages({["foo"], @source}) == {@expected_pages, @source}
+
+      pages_list = {["foo"], @module} |> Workflow.pages()
+
+      assert pages_list == {@expected_pages, @module}
     end
   end
 
   test "workflow fetches image sources from pages" do
     with_mock ExMangaDownloadr.MangaReader.Page,
       [image: fn(_page_link) -> {:ok, @expected_image} end] do
-      assert Workflow.images_sources({["foo"], @source}) == [@expected_image]
+      assert Workflow.images_sources({["foo"], @module}) == [@expected_image]
     end
   end
 

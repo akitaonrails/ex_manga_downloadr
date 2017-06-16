@@ -1,11 +1,16 @@
 defmodule ExMangaDownloadr.CLI do
   alias ExMangaDownloadr.Workflow
-  require ExMangaDownloadr
 
   def main(args) do
-    args
-    |> parse_args
-    |> process
+    try do
+      args
+      |> parse_args
+      |> process
+    rescue
+      e in ExMangaDownloadr.Workflow ->
+        IO.puts e.message
+        System.halt 0
+    end
   end
 
   defp parse_args(args) do

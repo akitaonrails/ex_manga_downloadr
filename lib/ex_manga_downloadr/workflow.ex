@@ -1,5 +1,8 @@
 defmodule ExMangaDownloadr.Workflow do
   require Logger
+  alias ExMangaDownloadr.MangaSource
+
+  defexception message: "An error occurred"
 
   @max_demand             100 # maximum parallel HTTP GET batch
   @download_timeout       30000 # 30 seconds for download timeout
@@ -9,34 +12,29 @@ defmodule ExMangaDownloadr.Workflow do
   @maximum_pdf_generation 2 # the best value is probably the total number of CPU cores
 
   def determine_source(url) do
-    source = cond do
-      Regex.match?(~r/mangareader\.net/, url) ->
-        "mangareader"
-      Regex.match?(~r/mangafox\.me/, url) ->
-        "mangafox"
-      true ->
-        IO.puts "Wasn't able to determine the manga source, URL invalid."
-        System.halt(0)
+    case ExMangaDownloadr.MangaSource.for(url) do
+      {:ok, source} -> source
+      :error -> raise __MODULE__, message: "Unable to determine the manga source, URL invalid."
     end
-    {url, source}
   end
 
-  def chapters({url, source}) do
-    {:ok, {_manga_title, chapter_list}} = MangaWrapper.index_page(url, source)
-    {chapter_list, source}
+  def chapters(%MangaSource{url: url, module: module}) do
+    {:ok, {_manga_title, chapter_list}} = module.index_page(url)
+
+    {chapter_list, module}
   end
 
-  def pages({chapter_list, source}) do
+  def pages({chapter_list, module}) do
     pages_list = chapter_list
-      |> Task.async_stream(MangaWrapper, :chapter_page, [source], max_concurrency: @max_demand)
+      |> Task.async_stream(module, :chapter_page, [], max_concurrency: @max_demand)
       |> Enum.to_list()
       |> Enum.reduce([], fn {:ok, {:ok, list}}, acc -> acc ++ list end)
-    {pages_list, source}
+    {pages_list, module}
   end
 
-  def images_sources({pages_list, source}) do
+  def images_sources({pages_list, module}) do
     pages_list
-      |> Task.async_stream(MangaWrapper, :page_image, [source], max_concurrency: @max_demand)
+      |> Task.async_stream(module, :page_image, [], max_concurrency: @max_demand)
       |> Enum.to_list()
       |> Enum.map(fn {:ok, {:ok, image}} -> image end)
   end
