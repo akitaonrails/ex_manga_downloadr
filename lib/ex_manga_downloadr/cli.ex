@@ -52,7 +52,7 @@ defmodule ExMangaDownloadr.CLI do
     File.mkdir_p!(directory)
     File.mkdir_p!("/tmp/ex_manga_downloadr_cache")
 
-    manga_name = directory |> String.split("/") |> Enum.reverse |> Enum.at(0)
+    manga_name = directory |> String.split("/") |> List.last
     url
       |> Workflow.determine_source
       |> Workflow.chapters
