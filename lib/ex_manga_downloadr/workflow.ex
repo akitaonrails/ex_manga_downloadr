@@ -2,7 +2,7 @@ defmodule ExMangaDownloadr.Workflow do
   require Logger
   alias ExMangaDownloadr.MangaSource
 
-  defexception message: "An error occurred"
+  defexception message: nil
 
   @max_demand             100 # maximum parallel HTTP GET batch
   @download_timeout       30000 # 30 seconds for download timeout
