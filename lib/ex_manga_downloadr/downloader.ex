@@ -24,7 +24,7 @@ defmodule ExMangaDownloadr.Downloader do
           if System.get_env("CACHE_HTTP") && !File.exists?(cache_path) do
             File.write!(cache_path, gunzip(body, headers))
           end
-          response
+          %{response | body: gunzip(body, headers)}
         %HTTPoison.Error{} ->
             :timer.sleep(@time_to_wait_to_fetch_again)
             call(url, retries - 1)
