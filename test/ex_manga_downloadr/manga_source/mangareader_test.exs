@@ -1,6 +1,6 @@
-defmodule ExMangaDownloadr.MangaReaderTest do
+defmodule ExMangaDownloadr.MangaSource.MangaReaderTest do
   use ExUnit.Case
-  alias ExMangaDownloadr.MangaReader
+  alias ExMangaDownloadr.MangaSource.MangaReader
 
   @test_manga_url "http://www.mangareader.net/death-note"
   @manga_title "Death Note Manga"

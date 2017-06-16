@@ -1,6 +1,7 @@
 defmodule MangaSourceTest do
   use ExUnit.Case, async: true
-  alias ExMangaDownloadr.{MangaSource, MangaReader, Mangafox}
+  alias ExMangaDownloadr.MangaSource
+  alias ExMangaDownloadr.MangaSource.{MangaReader, Mangafox}
 
   test "delivers a MangaReader source struct when URL matches" do
     url = "http://www.mangareader.net/boku-wa-ookami"

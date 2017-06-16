@@ -1,4 +1,4 @@
-defmodule ExMangaDownloadr.MangaReader.Page do
+defmodule ExMangaDownloadr.MangaSource.MangaReader.Page do
   def fetch_image(html) do
     html
     |> Floki.find("div[id='imgholder'] img")

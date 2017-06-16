@@ -1,7 +1,7 @@
-defmodule ExMangaDownloadr.MangaReader do
+defmodule ExMangaDownloadr.MangaSource.MangaReader do
   @behaviour ExMangaDownloadr.MangaSource
 
-  import ExMangaDownloadr.MangaReader.{IndexPage, ChapterPage, Page}
+  import ExMangaDownloadr.MangaSource.MangaReader.{IndexPage, ChapterPage, Page}
 
   def applies?(url), do: ~r/mangareader\.net/ |> Regex.match?(url)
 

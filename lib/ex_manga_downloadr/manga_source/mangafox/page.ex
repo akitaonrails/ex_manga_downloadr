@@ -1,7 +1,4 @@
-defmodule ExMangaDownloadr.Mangafox.Page do
-  require Logger
-  require ExMangaDownloadr
-
+defmodule ExMangaDownloadr.MangaSource.Mangafox.Page do
   def fetch_image(html, page_link) do
     html
     |> Floki.find("div[class='read_img'] img")

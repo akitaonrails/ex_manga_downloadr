@@ -1,4 +1,4 @@
-defmodule ExMangaDownloadr.Mangafox.IndexPage do
+defmodule ExMangaDownloadr.MangaSource.Mangafox.IndexPage do
   def fetch_manga_title(html) do
     html
     |> Floki.find("h1")
