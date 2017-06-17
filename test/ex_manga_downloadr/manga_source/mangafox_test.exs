@@ -31,24 +31,24 @@ defmodule ExMangaDownloadr.MangaSource.MangafoxTest do
   ]
 
   test "get all chapters available for the manga" do
-    {manga_title, chapter_list} = Mangafox.index_page(@url) |> extract_value
+    {manga_title, chapter_list} = @url |> Mangafox.index_page |> extract_value
 
     assert manga_title == @manga_title
     assert chapter_list == @expected_chapters
   end
 
   test "get all the pages of a given chapter" do
-    pages_list = Enum.map @expected_chapters, fn chapter_url ->
-      Mangafox.chapter_page(chapter_url) |> extract_value
-    end
+    pages_list = @expected_chapters |> Enum.map(fn chapter_url ->
+      chapter_url |> Mangafox.chapter_page |> extract_value
+    end)
 
     assert pages_list == @expected_pages
   end
 
   test "get the main image of each page" do
-    images_list = Enum.map @expected_pages, fn list ->
-      Enum.map list, &Mangafox.page_image(&1) |> extract_value
-    end
+    images_list = @expected_pages |> Enum.map(fn list ->
+      list |> Enum.map(&Mangafox.page_image(&1) |> extract_value)
+    end)
 
     assert images_list == @expected_images_list
   end

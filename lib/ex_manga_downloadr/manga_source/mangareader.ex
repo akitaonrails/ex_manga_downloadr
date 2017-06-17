@@ -1,8 +1,8 @@
 defmodule ExMangaDownloadr.MangaSource.MangaReader do
-  @behaviour ExMangaDownloadr.MangaSource
+  alias ExMangaDownloadr.{MangaSource, Downloader}
+  import MangaSource.MangaReader.{IndexPage, ChapterPage, Page}
 
-  alias ExMangaDownloadr.Downloader
-  import ExMangaDownloadr.MangaSource.MangaReader.{IndexPage, ChapterPage, Page}
+  @behaviour MangaSource.Behaviour
 
   def applies?(url), do: ~r/mangareader\.net/ |> Regex.match?(url)
 

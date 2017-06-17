@@ -1,5 +1,5 @@
 defmodule ExMangaDownloadr.MangaSource.Mangafox do
-  @behaviour ExMangaDownloadr.MangaSource
+  @behaviour ExMangaDownloadr.MangaSource.Behaviour
 
   alias ExMangaDownloadr.Downloader
   import ExMangaDownloadr.MangaSource.Mangafox.{IndexPage, ChapterPage, Page}

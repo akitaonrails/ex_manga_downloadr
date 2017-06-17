@@ -1,7 +1,6 @@
 defmodule ExMangaDownloadr.Downloader.Mock do
-  @behaviour ExMangaDownloadr.Downloader
-
-  @fixtures_dir "#{File.cwd!}/test/fixtures"
+  @behaviour ExMangaDownloadr.Downloader.Behaviour
+  @fixtures_dir Path.join([File.cwd!, "test", "fixtures"])
 
   def call("http://src_foo") do
     %HTTPoison.Response{body: "fake_response", status_code: 200}
@@ -20,7 +19,7 @@ defmodule ExMangaDownloadr.Downloader.Mock do
   end
 
   defp fixture_dir(path, base) do
-    "#{@fixtures_dir}/#{base}/#{path}"
+    Path.join([@fixtures_dir, base, path])
   end
 
   defp read_fixture(path) do

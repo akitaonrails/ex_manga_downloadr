@@ -22,24 +22,24 @@ defmodule ExMangaDownloadr.MangaSource.MangaReaderTest do
   ]
 
   test "get all chapters available for the manga" do
-    {manga_title, chapter_list} = MangaReader.index_page(@url) |> extract_value
+    {manga_title, chapter_list} = @url |> MangaReader.index_page |> extract_value
 
     assert manga_title == @manga_title
     assert chapter_list == @expected_chapters
   end
 
   test "get all the pages of a given chapter" do
-    pages_list = Enum.flat_map @expected_chapters, fn chapter_url ->
-      MangaReader.chapter_page(chapter_url) |> extract_value
-    end
+    pages_list = @expected_chapters |> Enum.flat_map(fn chapter_url ->
+      chapter_url |> MangaReader.chapter_page |> extract_value
+    end)
 
     assert pages_list == @expected_pages
   end
 
   test "get the main image of each page" do
-    images_list = Enum.map @expected_pages, fn page_url ->
-      MangaReader.page_image(page_url) |> extract_value
-    end
+    images_list = @expected_pages |> Enum.map(fn page_url ->
+      page_url |> MangaReader.page_image |> extract_value
+    end)
 
     assert images_list == @expected_images_list
   end

@@ -1,5 +1,5 @@
 defmodule ExMangaDownloadr.Downloader do
-  @callback call(String.t) :: %HTTPoison.Response{}
+  @behaviour ExMangaDownloadr.Downloader.Behaviour
   @downloader Application.get_env(:ex_manga_downloadr, :downloader)
 
   def call(url) do

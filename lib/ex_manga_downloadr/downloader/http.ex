@@ -1,5 +1,5 @@
 defmodule ExMangaDownloadr.Downloader.HTTP do
-  @behaviour ExMangaDownloadr.Downloader
+  @behaviour ExMangaDownloadr.Downloader.Behaviour
 
   @max_retries  50
   @time_to_wait_to_fetch_again 1_000
