@@ -42,7 +42,7 @@ defmodule ExMangaDownloadr.Workflow do
 
   def process_downloads(images_list, directory) do
     images_list
-      |> Task.async_stream(ImageDownloader, :call, [directory], max_concurrency: @max_demand / 2, timeout: @download_timeout)
+      |> Task.async_stream(ExMangaDownloadr.ImageDownloader, :call, [directory], max_concurrency: @max_demand / 2, timeout: @download_timeout)
       |> Enum.to_list()
     directory
   end
