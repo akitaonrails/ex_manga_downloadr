@@ -26,6 +26,7 @@ defmodule ExMangaDownloadr.Workflow do
 
   def pages({chapter_list, module}) do
     pages_list = chapter_list
+      |> ExMangaDownloadr.apply_env_options
       |> Task.async_stream(module, :chapter_page, [], max_concurrency: @max_demand)
       |> Enum.to_list()
       |> Enum.reduce([], fn {:ok, {:ok, list}}, acc -> acc ++ list end)
@@ -34,6 +35,7 @@ defmodule ExMangaDownloadr.Workflow do
 
   def images_sources({pages_list, module}) do
     pages_list
+      |> ExMangaDownloadr.apply_env_options
       |> Task.async_stream(module, :page_image, [], max_concurrency: @max_demand)
       |> Enum.to_list()
       |> Enum.map(fn {:ok, {:ok, image}} -> image end)
@@ -41,6 +43,7 @@ defmodule ExMangaDownloadr.Workflow do
 
   def process_downloads(images_list, directory) do
     images_list
+      |> ExMangaDownloadr.apply_env_options
       |> Task.async_stream(ImageDownloader, :call, [directory], max_concurrency: @max_demand / 2, timeout: @download_timeout)
       |> Enum.to_list()
     directory
