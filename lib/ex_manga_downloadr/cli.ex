@@ -19,7 +19,9 @@ defmodule ExMangaDownloadr.CLI do
       aliases: [u: :url, d: :directory, t: :boolean]
     )
     case parse do
-      {[test: true], _, _} -> process_test("/tmp/ex_one_punch_man", "http://www.mangareader.net/onepunch-man")
+      {[test: true], _, _} ->
+        directory = System.get_env("TEST_DIRECTORY") || "/tmp/ex_one_punch_man"
+        process_test(directory, "http://www.mangareader.net/onepunch-man")
       {[url: url, directory: directory], _, _} -> process(directory, url)
       {_, _, _ } -> process(:help)
     end
