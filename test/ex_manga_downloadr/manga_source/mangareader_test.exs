@@ -1,7 +1,7 @@
 defmodule ExMangaDownloadr.MangaSource.MangaReaderTest do
   use ExUnit.Case
   alias ExMangaDownloadr.MangaSource.MangaReader
-  import TestHelper, only: [extract_value: 1]
+  import TestHelper, only: [extract_ok_value: 1]
 
   @url "http://www.mangareader.net/death-note/index.html"
   @manga_title "Death Note Manga"
@@ -22,7 +22,7 @@ defmodule ExMangaDownloadr.MangaSource.MangaReaderTest do
   ]
 
   test "get all chapters available for the manga" do
-    {manga_title, chapter_list} = @url |> MangaReader.index_page |> extract_value
+    {manga_title, chapter_list} = @url |> MangaReader.index_page |> extract_ok_value
 
     assert manga_title == @manga_title
     assert chapter_list == @expected_chapters
@@ -30,7 +30,7 @@ defmodule ExMangaDownloadr.MangaSource.MangaReaderTest do
 
   test "get all the pages of a given chapter" do
     pages_list = @expected_chapters |> Enum.flat_map(fn chapter_url ->
-      chapter_url |> MangaReader.chapter_page |> extract_value
+      chapter_url |> MangaReader.chapter_page |> extract_ok_value
     end)
 
     assert pages_list == @expected_pages
@@ -38,7 +38,7 @@ defmodule ExMangaDownloadr.MangaSource.MangaReaderTest do
 
   test "get the main image of each page" do
     images_list = @expected_pages |> Enum.map(fn page_url ->
-      page_url |> MangaReader.page_image |> extract_value
+      page_url |> MangaReader.page_image |> extract_ok_value
     end)
 
     assert images_list == @expected_images_list

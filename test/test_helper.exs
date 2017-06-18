@@ -6,5 +6,5 @@ ExUnit.start()
 ExMangaDownloadr.create_cache_dir
 
 defmodule TestHelper do
-  def extract_value({:ok, value}), do: value
+  def extract_ok_value({:ok, value}), do: value
 end
