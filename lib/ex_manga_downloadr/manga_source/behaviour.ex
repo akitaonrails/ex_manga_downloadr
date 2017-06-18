@@ -1,6 +1,15 @@
 defmodule ExMangaDownloadr.MangaSource.Behaviour do
-  @callback applies?(source :: String.t) :: boolean()
-  @callback index_page(url :: String.t) :: {String.t, [...]}
-  @callback chapter_page(page_link :: String.t) :: {:ok, any}
-  @callback page_image(page_link :: String.t) :: {:ok, any}
+  @type manga_title :: String.t
+  @type url :: String.t
+  @type chapter_url :: url
+  @type page_url :: url
+  @type image_url :: url
+  @type image_name :: String.t
+  @type chapter_list :: [url]
+  @type page_list :: [url]
+
+  @callback applies?(url) :: boolean
+  @callback index_page(url) :: {manga_title, chapter_list}
+  @callback chapter_page(chapter_url) :: {:ok, page_list}
+  @callback page_image(url) :: {:ok, [{image_url, image_name}]}
 end
