@@ -56,14 +56,19 @@ defmodule ExMangaDownloadr.CLI do
 
     manga_name = directory |> String.split("/") |> List.last
     url
+      |> scrap_and_download(directory)
+      |> Workflow.optimize_images
+      |> Workflow.compile_pdfs(manga_name)
+      |> finish_process
+  end
+
+  defp scrap_and_download(url, directory) do
+    url
       |> Workflow.determine_source
       |> Workflow.chapters
       |> Workflow.pages
       |> Workflow.images_sources
       |> Workflow.process_downloads(directory)
-      |> Workflow.optimize_images
-      |> Workflow.compile_pdfs(manga_name)
-      |> finish_process
   end
 
   defp process_test(directory, url) do
@@ -71,11 +76,7 @@ defmodule ExMangaDownloadr.CLI do
     ExMangaDownloadr.create_cache_dir
 
     url
-      |> Workflow.determine_source
-      |> Workflow.chapters
-      |> Workflow.pages
-      |> Workflow.images_sources
-      |> Workflow.process_downloads(directory)
+      |> scrap_and_download(directory)
 
     directory
       |> finish_process
