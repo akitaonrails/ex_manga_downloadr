@@ -53,8 +53,10 @@ defmodule ExMangaDownloadrTest do
   test "workflow tries to download the images" do
     {:ok, tmpdir} = Briefly.create(directory: true)
 
-    assert Workflow.process_downloads([{"http://src_foo", "filename"}], tmpdir) == tmpdir
-    assert File.read("#{tmpdir}/filename") == {:ok, "fake_response"}
+    dir = Workflow.process_downloads([{"http://success200.com", "filename"}], tmpdir)
+
+    assert dir == tmpdir
+    assert File.read("#{tmpdir}/filename") == {:ok, "fake"}
   end
 
   test "workflow skips existing images" do
@@ -62,7 +64,9 @@ defmodule ExMangaDownloadrTest do
 
     File.touch! "#{tmpdir}/filename"
 
-    assert Workflow.process_downloads([{"http://src_foo", "filename"}], tmpdir) == tmpdir
+    dir = Workflow.process_downloads([{"http://src_foo", "filename"}], tmpdir)
+
+    assert dir == tmpdir
     assert File.read("#{tmpdir}/filename") == {:ok, ""}
   end
 

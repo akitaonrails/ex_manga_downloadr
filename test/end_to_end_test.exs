@@ -13,7 +13,7 @@ defmodule EndToEndTest do
     import Porcelain, only: [shell: 1]
 
     shell "mix escript.build"
-    shell "LIST_LIMIT=1 ./ex_manga_downloadr -u #{url} -d #{dir}"
+    shell "END_TO_END_TEST_MODE=1 ./ex_manga_downloadr -u #{url} -d #{dir}"
   end
 
   test "downloads from mangareader correctly" do

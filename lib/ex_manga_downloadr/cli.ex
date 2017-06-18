@@ -49,8 +49,8 @@ defmodule ExMangaDownloadr.CLI do
   end
 
   defp process(directory, url) do
-    File.mkdir_p!(directory)
-    File.mkdir_p!("/tmp/ex_manga_downloadr_cache")
+    File.mkdir_p! directory
+    ExMangaDownloadr.create_cache_dir
 
     manga_name = directory |> String.split("/") |> List.last
     url
@@ -65,8 +65,8 @@ defmodule ExMangaDownloadr.CLI do
   end
 
   defp process_test(directory, url) do
-    File.mkdir_p!(directory)
-    File.mkdir_p!("/tmp/ex_manga_downloadr_cache")
+    File.mkdir_p! directory
+    ExMangaDownloadr.create_cache_dir
 
     url
       |> Workflow.determine_source
