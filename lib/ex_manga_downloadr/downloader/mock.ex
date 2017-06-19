@@ -8,16 +8,12 @@ defmodule ExMangaDownloadr.Downloader.Mock do
     %Response{body: "fake", status_code: 200}
   end
 
-  def call("http://mangafox.me/" <> path) do
-    path
-    |> Fixture.read("mangafox.me")
-    |> to_success_response()
-  end
-
-  def call("http://www.mangareader.net/" <> path) do
-    path
-    |> Fixture.read("mangareader.net")
-    |> to_success_response()
+  def call("http://gzip200ok.com") do
+    %Response{
+      status_code: 200,
+      body: :zlib.gzip("fake"),
+      headers: [{"Content-Encoding", "gzip"}]
+    }
   end
 
   def call("http://error500.com") do
@@ -28,16 +24,20 @@ defmodule ExMangaDownloadr.Downloader.Mock do
     %Response{status_code: 301, headers: [{"Location", "http://success200.com"}]}
   end
 
-  def call("http://gzip200ok.com") do
-    %Response{
-      status_code: 200,
-      body: :zlib.gzip("fake"),
-      headers: [{"Content-Encoding", "gzip"}]
-    }
-  end
-
   def call("http://http_library_error.com") do
     %Error{}
+  end
+
+  def call("http://mangafox.me/" <> path) do
+    path
+    |> Fixture.read("mangafox.me")
+    |> to_success_response()
+  end
+
+  def call("http://www.mangareader.net/" <> path) do
+    path
+    |> Fixture.read("mangareader.net")
+    |> to_success_response()
   end
 
   def to_success_response(body) do
