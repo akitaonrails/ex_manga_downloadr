@@ -2,8 +2,7 @@ defmodule ExMangaDownloadr.Cache.FS do
   @behaviour ExMangaDownloadr.Cache.Behaviour
 
   def call(id, options, callback) do
-    id
-    |> read(options)
+    read(id, options)
     |> do_call(id, options, callback)
   end
 
@@ -15,8 +14,7 @@ defmodule ExMangaDownloadr.Cache.FS do
   end
 
   def write(id, contents, options) do
-    id
-    |> cache_path(options)
+    cache_path(id, options)
     |> File.write!(contents)
   end
 
@@ -25,8 +23,7 @@ defmodule ExMangaDownloadr.Cache.FS do
   end
 
   defp filename(id) do
-    :md5
-    |> :crypto.hash(id)
+    :crypto.hash(:md5, id)
     |> Base.encode16()
   end
 

@@ -26,8 +26,7 @@ defmodule ExMangaDownloadr.Downloader do
 
   defp parse_options(options) do
     @default_options
-    |> Map.merge(options
-    |> Enum.into(%{}))
+    |> Map.merge(options |> Enum.into(%{}))
   end
 
   def call(url, retries, options) when retries > 0 do

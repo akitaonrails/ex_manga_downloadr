@@ -7,8 +7,7 @@ defmodule ExMangaDownloadr.MangaSource do
   end
 
   defp module_for(url) do
-    :ex_manga_downloadr
-    |> Application.get_env(:sources)
+    Application.get_env(:ex_manga_downloadr, :sources)
     |> Enum.find(:invalid, & &1.applies?(url))
   end
 end
