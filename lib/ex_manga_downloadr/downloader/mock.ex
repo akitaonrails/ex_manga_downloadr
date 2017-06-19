@@ -1,23 +1,8 @@
-defmodule ExMangaDownloadr.Fixture do
-  @fixtures_dir Path.join([File.cwd!, "test", "fixtures"])
-
-  def read(path, base) do
-    case path |> dir(base) |> File.read() do
-      {:ok, body} -> body
-      _ -> raise "Could not find fixture #{path}"
-    end
-  end
-
-  defp dir(path, base) do
-    Path.join([@fixtures_dir, base, path])
-  end
-end
-
 defmodule ExMangaDownloadr.Downloader.Mock do
   @behaviour ExMangaDownloadr.Downloader.Behaviour
 
   alias HTTPoison.{Response, Error}
-  alias ExMangaDownloadr.Fixture
+  alias ExMangaDownloadr.Support.Fixture
 
   def call("http://success200.com") do
     %Response{body: "fake", status_code: 200}
