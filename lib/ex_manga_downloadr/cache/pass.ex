@@ -1,5 +1,5 @@
 defmodule ExMangaDownloadr.Cache.Pass do
   @behaviour ExMangaDownloadr.Cache.Behaviour
 
-  def call(_, _, callback), do: callback.(:cache_miss, "")
+  def call(_, _, cb), do: cb.(:cache_miss, "")
 end

@@ -1,9 +1,9 @@
 defmodule ExMangaDownloadr.Cache.FS do
   @behaviour ExMangaDownloadr.Cache.Behaviour
 
-  def call(id, options, callback) do
+  def call(id, options, cb) do
     read(id, options)
-    |> do_call(id, options, callback)
+    |> do_call(id, options, cb)
   end
 
   def read(id, options) do
@@ -27,8 +27,8 @@ defmodule ExMangaDownloadr.Cache.FS do
     |> Base.encode16()
   end
 
-  defp do_call(:cache_miss, id, options, callback) do
-    value = callback.(:cache_miss, "")
+  defp do_call(:cache_miss, id, options, cb) do
+    value = cb.(:cache_miss, "")
     extract = options[:extractor] || &(&1)
 
     write id, extract.(value), options
@@ -36,7 +36,7 @@ defmodule ExMangaDownloadr.Cache.FS do
     value
   end
 
-  defp do_call(contents, _, _, callback) do
-    callback.(:cache_hit, contents)
+  defp do_call(contents, _, _, cb) do
+    cb.(:cache_hit, contents)
   end
 end

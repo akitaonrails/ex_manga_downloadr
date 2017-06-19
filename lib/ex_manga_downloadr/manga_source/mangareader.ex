@@ -20,8 +20,8 @@ defmodule ExMangaDownloadr.MangaSource.MangaReader do
     |> fetch_path_body(&fetch_image/1)
   end
 
-  defp fetch_path_body(path, callback) do
+  defp fetch_path_body(path, cb) do
     "http://www.mangareader.net#{path}"
-    |> Downloader.fetch_body(callback)
+    |> Downloader.fetch_body(cb)
   end
 end
