@@ -1,70 +1,89 @@
 defmodule ExMangaDownloadrTest do
   use ExUnit.Case, async: false
   alias ExMangaDownloadr.Workflow
+
   doctest ExMangaDownloadr
 
-  import Mock
+  defmodule Expected do
+    def chapters, do: [
+      "/boku-wa-ookami/1",
+      "/boku-wa-ookami/2",
+      "/boku-wa-ookami/3"
+    ]
 
-  @source "mangareader"
-  @user_agent Application.get_env(:ex_manga_downloadr, :user_agent)
+    def pages, do: [
+      "/boku-wa-ookami/1",
+      "/boku-wa-ookami/1/2",
+      "/boku-wa-ookami/1/3"
+    ]
 
-  @expected_manga_title "Boku wa Ookami Manga"
-  @expected_chapters ["/boku-wa-ookami/1", "/boku-wa-ookami/2", "/boku-wa-ookami/3"]
-  @expected_pages ["/boku-wa-ookami/1", "/boku-wa-ookami/1/2", "/boku-wa-ookami/1/3"]
-  @expected_image {"http://i3.mangareader.net/boku-wa-ookami/1/boku-wa-ookami-2523599.jpg",
-      "Ookami wa Boku 00001 - Page 00001.jpg"}
+    def image, do: {
+      "http://i3.mangareader.net/boku-wa-ookami/1/boku-wa-ookami-2523599.jpg",
+      "Ookami wa Boku 00001 - Page 00001.jpg"
+    }
+  end
+
+  defmodule FakeMangaSource do
+    @behaviour ExMangaDownloadr.MangaSource.Behaviour
+
+    def applies?(_url), do: true
+    def index_page("http://foo.com"), do: {:ok, {"Title", Expected.chapters()}}
+    def chapter_page("page_link"), do: {:ok, Expected.pages()}
+    def page_image("chapter_link"), do: {:ok, Expected.image()}
+  end
 
   test "workflow fetches chapters" do
-    with_mock ExMangaDownloadr.MangaReader.IndexPage,
-      [chapters: fn(_url) -> {:ok, {@expected_manga_title, @expected_chapters}} end] do
-      assert Workflow.chapters({"foo", @source}) == {@expected_chapters, @source}
-    end
+    chapters_list = {"http://foo.com", FakeMangaSource} |> Workflow.chapters()
+
+    assert chapters_list == {Expected.chapters(), FakeMangaSource}
   end
 
   test "workflow fetches pages from chapters" do
-    with_mock ExMangaDownloadr.MangaReader.ChapterPage,
-      [pages: fn(_chapter_link) -> {:ok, @expected_pages} end] do
-      assert Workflow.pages({["foo"], @source}) == {@expected_pages, @source}
-    end
+    pages_list = {["page_link"], FakeMangaSource} |> Workflow.pages()
+
+    assert pages_list == {Expected.pages(), FakeMangaSource}
   end
 
   test "workflow fetches image sources from pages" do
-    with_mock ExMangaDownloadr.MangaReader.Page,
-      [image: fn(_page_link) -> {:ok, @expected_image} end] do
-      assert Workflow.images_sources({["foo"], @source}) == [@expected_image]
-    end
+    images_list = {["chapter_link"], FakeMangaSource} |> Workflow.images_sources()
+
+    assert images_list == [Expected.image()]
   end
 
   test "workflow tries to download the images" do
-    with_mock HTTPoison,
-      [get!: fn(_url, _headers, _options) -> %HTTPoison.Response{ body: nil, headers: nil, status_code: 200 } end] do
-      with_mock File, [write!: fn(_filename, _body) -> nil end,
-                       exists?: fn(_filename) -> false end] do
-        assert Workflow.process_downloads([{"http://src_foo", "filename_foo"}], "/tmp") == "/tmp"
+    {:ok, tmpdir} = Briefly.create(directory: true)
 
-        assert called HTTPoison.get!("http://src_foo", ExMangaDownloadr.http_headers, ExMangaDownloadr.http_options)
-        assert called File.write!("/tmp/filename_foo", nil)
-      end
-    end
+    dir = Workflow.process_downloads([{"http://success200.com", "filename"}], tmpdir)
+
+    assert dir == tmpdir
+    assert File.read("#{tmpdir}/filename") == {:ok, "fake"}
   end
 
   test "workflow skips existing images" do
-    with_mock File, [exists?: fn(_filename) -> true end] do
-      assert Workflow.process_downloads([{"http://src_foo", "filename_foo"}], "/tmp") == "/tmp"
-    end
+    {:ok, tmpdir} = Briefly.create(directory: true)
+
+    File.touch! "#{tmpdir}/filename"
+
+    dir = Workflow.process_downloads([{"http://src_foo", "filename"}], tmpdir)
+
+    assert dir == tmpdir
+    assert File.read("#{tmpdir}/filename") == {:ok, ""}
   end
 
   test "workflow tries to generate the PDFs" do
-    with_mock File, [ls:      fn(_dir)       -> {:ok, ["1.jpg", "2.jpg"]} end,
-                     mkdir_p: fn(_dir)       -> nil end,
-                     rename:  fn(_from, _to) -> nil end] do
-      with_mock Porcelain, [shell: fn(_cmd) -> nil end] do
-        Workflow.compile_pdfs("/tmp/manga_foo", "manga_foo")
+    import Mock
 
-        assert called File.rename("/tmp/manga_foo/1.jpg", "/tmp/manga_foo/manga_foo_1/1.jpg")
-        assert called File.rename("/tmp/manga_foo/2.jpg", "/tmp/manga_foo/manga_foo_1/2.jpg")
-        assert called Porcelain.shell("convert /tmp/manga_foo/manga_foo_1/*.jpg /tmp/manga_foo/manga_foo_1.pdf")
-      end
+    {:ok, tmpdir} = Briefly.create(directory: true)
+    Enum.each [1, 2], &File.write("#{tmpdir}/#{&1}.jpg", "file#{&1}")
+
+    with_mock Porcelain, [shell: fn(_cmd) -> nil end] do
+      Workflow.compile_pdfs(tmpdir, "manga_foo")
+
+      refute File.exists?("#{tmpdir}/1.jpg")
+      refute File.exists?("#{tmpdir}/2.jpg")
+      assert File.read("#{tmpdir}/manga_foo_1/1.jpg") == {:ok, "file1"}
+      assert File.read("#{tmpdir}/manga_foo_1/2.jpg") == {:ok, "file2"}
+      assert called Porcelain.shell("convert #{tmpdir}/manga_foo_1/*.jpg #{tmpdir}/manga_foo_1.pdf")
     end
   end
 end

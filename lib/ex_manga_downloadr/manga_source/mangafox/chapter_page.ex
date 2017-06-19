@@ -1,12 +1,5 @@
-defmodule ExMangaDownloadr.Mangafox.ChapterPage do
-  require Logger
-  require ExMangaDownloadr
-
-  def pages(chapter_link) do
-    ExMangaDownloadr.fetch chapter_link, do: fetch_pages(chapter_link)
-  end
-
-  defp fetch_pages(html, chapter_link) do
+defmodule ExMangaDownloadr.MangaSource.Mangafox.ChapterPage do
+  def fetch_pages(html, chapter_link) do
     [_page|link_template] = chapter_link |> String.split("/") |> Enum.reverse
 
     html

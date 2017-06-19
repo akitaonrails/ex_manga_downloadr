@@ -1,11 +1,16 @@
 defmodule ExMangaDownloadr.CLI do
   alias ExMangaDownloadr.Workflow
-  require ExMangaDownloadr
 
   def main(args) do
-    args
-    |> parse_args
-    |> process
+    try do
+      args
+      |> parse_args
+      |> process
+    rescue
+      e in ExMangaDownloadr.Workflow ->
+        IO.puts e.message
+        System.halt 0
+    end
   end
 
   defp parse_args(args) do
@@ -14,7 +19,9 @@ defmodule ExMangaDownloadr.CLI do
       aliases: [u: :url, d: :directory, t: :boolean]
     )
     case parse do
-      {[test: true], _, _} -> process_test("/tmp/ex_one_punch_man", "http://www.mangareader.net/onepunch-man")
+      {[test: true], _, _} ->
+        directory = System.get_env("TEST_DIRECTORY") || "/tmp/ex_one_punch_man"
+        process_test(directory, "http://www.mangareader.net/onepunch-man")
       {[url: url, directory: directory], _, _} -> process(directory, url)
       {_, _, _ } -> process(:help)
     end
@@ -44,31 +51,32 @@ defmodule ExMangaDownloadr.CLI do
   end
 
   defp process(directory, url) do
-    File.mkdir_p!(directory)
-    File.mkdir_p!("/tmp/ex_manga_downloadr_cache")
+    File.mkdir_p! directory
+    ExMangaDownloadr.create_cache_dir
 
-    manga_name = directory |> String.split("/") |> Enum.reverse |> Enum.at(0)
+    manga_name = directory |> String.split("/") |> List.last
     url
-      |> Workflow.determine_source
-      |> Workflow.chapters
-      |> Workflow.pages
-      |> Workflow.images_sources
-      |> Workflow.process_downloads(directory)
+      |> scrap_and_download(directory)
       |> Workflow.optimize_images
       |> Workflow.compile_pdfs(manga_name)
       |> finish_process
   end
 
-  defp process_test(directory, url) do
-    File.mkdir_p!(directory)
-    File.mkdir_p!("/tmp/ex_manga_downloadr_cache")
-
+  defp scrap_and_download(url, directory) do
     url
       |> Workflow.determine_source
       |> Workflow.chapters
       |> Workflow.pages
       |> Workflow.images_sources
       |> Workflow.process_downloads(directory)
+  end
+
+  defp process_test(directory, url) do
+    File.mkdir_p! directory
+    ExMangaDownloadr.create_cache_dir
+
+    url
+      |> scrap_and_download(directory)
 
     directory
       |> finish_process

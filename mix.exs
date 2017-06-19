@@ -32,7 +32,8 @@ defmodule ExMangaDownloadr.Mixfile do
       {:httpoison, "~> 0.11"},
       {:floki, "~> 0.17"},
       {:porcelain, "~> 2.0.3"},
-      {:mock, "~> 0.2", only: :test}
+      {:mock, "~> 0.2", only: :test},
+      {:briefly, "~> 0.3", only: :test}
     ]
   end
 end

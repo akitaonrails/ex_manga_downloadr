@@ -1,12 +1,5 @@
-defmodule ExMangaDownloadr.MangaReader.Page do
-  require Logger
-  require ExMangaDownloadr
-
-  def image(page_link) do
-    ExMangaDownloadr.fetch "http://www.mangareader.net#{page_link}", do: fetch_image
-  end
-
-  defp fetch_image(html) do
+defmodule ExMangaDownloadr.MangaSource.MangaReader.Page do
+  def fetch_image(html) do
     html
     |> Floki.find("div[id='imgholder'] img")
     |> Enum.map(&normalize_metadata/1)

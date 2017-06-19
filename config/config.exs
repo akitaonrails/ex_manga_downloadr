@@ -27,6 +27,12 @@ use Mix.Config
 # Configuration from the imported file will override the ones defined
 # here (which is why it is important to import them last).
 #
-#     import_config "#{Mix.env}.exs"
+
+import_config "#{Mix.env}.exs"
 
 config :ex_manga_downloadr, user_agent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/45.0.2454.101 Chrome/45.0.2454.101 Safari/537.36"
+config :ex_manga_downloadr, sources: [
+  ExMangaDownloadr.MangaSource.Mangafox,
+  ExMangaDownloadr.MangaSource.MangaReader
+]
+config :porcelain, driver: Porcelain.Driver.Basic

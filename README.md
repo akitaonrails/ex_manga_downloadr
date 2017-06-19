@@ -18,7 +18,8 @@ This can be compiled as a command line tool:
 
   3. Run tests if you want to contribute:
 
-        mix test
+        mix test --include slow # Run unit tests + slow end-to-end tests  
+        mix test # Run only unit tests
 
   4. Build
 
@@ -36,7 +37,7 @@ Mangafox CDN seems to restrict the amount of concurrent requests from the same o
 
 So, prefer to use Mangareader if possible. Or you can combine with HTTP cache so you can resume if the operation is interrupted:
 
-    CACHE_SIZE=true ./ex_manga_downloadr -u http://mangafox.me/manga/onepunch_man/ -d /tmp/onepunch
+    CACHE_HTTP=true ./ex_manga_downloadr -u http://mangafox.me/manga/onepunch_man/ -d /tmp/onepunch
 
 ## Test Mode
 
