@@ -1,7 +1,7 @@
 defmodule ExMangaDownloadr.Workflow do
   require Logger
 
-  @max_demand             100 # maximum parallel HTTP GET batch
+  @max_demand             50 # maximum parallel HTTP GET batch
   @download_timeout       30000 # 30 seconds for download timeout
   @image_dimensions       "600x800" # Kindle maximum resolution
   @pages_per_volume       250       # comfortable PDF file number of pages
